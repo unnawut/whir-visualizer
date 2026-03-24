@@ -5,7 +5,7 @@ export function S0_Introduction() {
   return (
     <Section
       id="introduction"
-      title="Introduction"
+      title="About"
       subtitle="An interactive guide to understanding the WHIR protocol — the polynomial commitment scheme inside leanVM."
     >
       <h3 id="about-this-visualizer" className="font-heading text-xl font-semibold text-text mb-3">

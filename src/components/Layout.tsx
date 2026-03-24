@@ -3,7 +3,7 @@ import { useState, type ReactNode } from 'react';
 export const SECTIONS = [
   {
     id: 'introduction',
-    label: 'Introduction',
+    label: 'About',
     subs: [
       { label: 'About This Visualizer', id: 'about-this-visualizer' },
       { label: 'How the Demos Work', id: 'how-demos-work' },
