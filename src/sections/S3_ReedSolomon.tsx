@@ -9,6 +9,220 @@ import { evaluateAll } from '../utils/polynomial';
 import type { Poly } from '../utils/polynomial';
 import { generateDomain } from '../utils/reedsolomon';
 
+/**
+ * Interactive illustration: a big circle with dots inside.
+ * Green dots = honest, red dots = corrupted by cheating.
+ * Verifier picks a few random dots (navy rings). If any land on red → caught.
+ */
+// Pre-computed dot positions (sunflower spiral, 16 dots)
+const DOT_POSITIONS: { x: number; y: number }[] = (() => {
+  const positions: { x: number; y: number }[] = [];
+  const ga = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < 16; i++) {
+    const r = Math.sqrt((i + 0.5) / 16) * 0.82;
+    const t = i * ga;
+    positions.push({ x: 0.5 + r * Math.cos(t) * 0.48, y: 0.5 + r * Math.sin(t) * 0.48 });
+  }
+  return positions;
+})();
+
+// Pre-computed corrupted indices per cheating level (avoids any loops at render time)
+// RS[16, 8]: min distance = 9, so changing 1 coeff corrupts >= 9 positions
+const CORRUPTION_MAP: boolean[][] = (() => {
+  // For each level 1..8, a fixed shuffled set of corrupted indices
+  const shuffled = [5, 12, 2, 9, 0, 14, 7, 11, 3, 15, 6, 10, 1, 13, 4, 8];
+  const map: boolean[][] = [];
+  for (let level = 0; level <= 8; level++) {
+    const count = level === 0 ? 0 : Math.min(16, 8 + level); // 0, 9, 10, 11, ..., 16
+    const arr = new Array(16).fill(false);
+    for (let i = 0; i < count; i++) arr[shuffled[i]] = true;
+    map.push(arr);
+  }
+  return map;
+})();
+
+// Pre-computed sample sets per seed (10 seeds × 10 max samples)
+const SAMPLE_SETS: number[][] = (() => {
+  const sets: number[][] = [];
+  for (let seed = 0; seed < 50; seed++) {
+    const order = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+    // Fisher-Yates with deterministic seed
+    let s = seed * 97 + 31;
+    for (let i = 15; i > 0; i--) {
+      s = (s * 48271) % 2147483647; // Park-Miller LCG, no infinite loop risk
+      const j = s % (i + 1);
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    sets.push(order);
+  }
+  return sets;
+})();
+
+function CheatingDemo() {
+  const [cheatingCoeffs, setCheatingCoeffs] = useState(0);
+  const [sampleCount, setSampleCount] = useState(3);
+  const [sampleSeed, setSampleSeed] = useState(0);
+
+  const n = 16;
+  const corrupted = CORRUPTION_MAP[cheatingCoeffs];
+  const numCorrupted = corrupted.filter(Boolean).length;
+  const samples = SAMPLE_SETS[sampleSeed % SAMPLE_SETS.length].slice(0, sampleCount);
+  const caughtCheating = samples.some(i => corrupted[i]);
+
+  const svgSize = 260;
+  const cx = svgSize / 2;
+  const cy = svgSize / 2;
+  const circleR = svgSize / 2 - 14;
+
+  return (
+    <div className="bg-bg-card border border-border rounded-lg p-5 my-6 space-y-5">
+      <div className="font-heading font-semibold text-base text-text">
+        Why Cheating is Hard with RS Encoding
+      </div>
+      <p className="text-sm text-text-muted">
+        The circle below represents all {n} evaluation points. When the prover cheats by
+        modifying even one polynomial coefficient, RS guarantees that{' '}
+        <strong>most</strong> points become corrupted (red). The verifier samples a few
+        random points (navy rings) — if any land on red, the cheater is caught.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Slider
+          label="Coefficients tampered"
+          value={cheatingCoeffs}
+          min={0}
+          max={8}
+          onChange={setCheatingCoeffs}
+          displayValue={`${cheatingCoeffs}`}
+        />
+        <Slider
+          label="Verifier's random samples"
+          value={sampleCount}
+          min={1}
+          max={8}
+          onChange={setSampleCount}
+          displayValue={`${sampleCount}`}
+        />
+      </div>
+
+      {/* SVG: big circle with dots inside */}
+      <div className="flex justify-center">
+        <svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`}>
+          <circle cx={cx} cy={cy} r={circleR} fill="#fefdfb" stroke="#e0dcd4" strokeWidth={2} />
+
+          {DOT_POSITIONS.map((pos, i) => {
+            const x = 14 + pos.x * (svgSize - 28);
+            const y = 14 + pos.y * (svgSize - 28);
+            const isCorrupt = corrupted[i];
+            const isSampled = samples.includes(i);
+            return (
+              <g key={i}>
+                <circle
+                  cx={x}
+                  cy={y}
+                  r={isSampled ? 8 : 6}
+                  fill={isCorrupt ? '#c53030' : '#2f855a'}
+                  fillOpacity={isCorrupt ? 0.75 : 0.5}
+                />
+                {isSampled && (
+                  <circle
+                    cx={x}
+                    cy={y}
+                    r={12}
+                    fill="none"
+                    stroke="#1a365d"
+                    strokeWidth={2.5}
+                  />
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center justify-center gap-5 text-xs text-text-muted">
+        <span className="flex items-center gap-1.5">
+          <svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#2f855a" fillOpacity="0.5" /></svg>
+          Honest
+        </span>
+        <span className="flex items-center gap-1.5">
+          <svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#c53030" fillOpacity="0.75" /></svg>
+          Corrupted
+        </span>
+        <span className="flex items-center gap-1.5">
+          <svg width="20" height="20"><circle cx="10" cy="10" r="8" fill="none" stroke="#1a365d" strokeWidth="2" /></svg>
+          Sampled
+        </span>
+      </div>
+
+      {/* Result */}
+      <div className="flex items-center justify-center gap-4">
+        <div className="text-center">
+          <div className="text-xs text-text-muted">Corrupted</div>
+          <div className="font-mono font-semibold text-red">
+            {numCorrupted}/{n}{' '}
+            <span className="text-text-muted font-normal">({Math.round(numCorrupted / n * 100)}%)</span>
+          </div>
+        </div>
+
+        <div
+          className={`px-5 py-2 rounded-full font-semibold text-sm ${
+            numCorrupted === 0
+              ? 'bg-green/10 text-green border border-green/20'
+              : caughtCheating
+                ? 'bg-green/10 text-green border border-green/20'
+                : 'bg-red/10 text-red border border-red/20'
+          }`}
+        >
+          {numCorrupted === 0 ? 'Honest prover' : caughtCheating ? 'Cheater caught!' : 'Slipped through'}
+        </div>
+
+        <button
+          onClick={() => setSampleSeed(s => s + 1)}
+          className="cursor-pointer text-xs text-navy hover:text-sienna transition-colors px-3 py-1.5 rounded border border-border hover:border-sienna/30"
+        >
+          Re-roll
+        </button>
+      </div>
+
+      {cheatingCoeffs === 0 ? (
+        <p className="text-xs text-text-muted text-center">
+          No tampering — all points are honest. Drag the slider to see what happens
+          when the prover changes even a single coefficient.
+        </p>
+      ) : (
+        <>
+          <p className="text-xs text-text-muted text-center">
+            {sampleCount} random sample{sampleCount > 1 ? 's' : ''} across {n} points
+            where {numCorrupted} ({Math.round(numCorrupted / n * 100)}%) are corrupted
+            — {caughtCheating ? 'cheater caught!' : 'got lucky — try re-rolling!'}{' '}
+            In leanVM, WHIR checks ~100+ positions across 2<sup>26</sup> points, making
+            evasion virtually impossible.
+          </p>
+          <div className="bg-sienna/5 border border-sienna/20 rounded-lg px-4 py-3 text-xs text-text-muted">
+            <strong className="text-sienna">Why {cheatingCoeffs === 1 ? 'does' : 'do'} {cheatingCoeffs} tampered coefficient{cheatingCoeffs > 1 ? 's' : ''} corrupt {numCorrupted} points?</strong>
+            <p className="mt-1">
+              Our RS code evaluates a degree-7 polynomial at {n} points (rate{' '}
+              <InlineMath tex="\rho = 1/2" />). Any two <em>different</em> polynomials of
+              degree {'<'} 8 can agree on at most 7 points (a degree-7 polynomial has at most 7
+              roots). So they must <em>disagree</em> on at least{' '}
+              <InlineMath tex="n - d + 1 = 16 - 8 + 1 = 9" /> positions.
+            </p>
+            <p className="mt-1">
+              This is the <strong>minimum distance</strong> of the RS code. It means there is
+              no way to tamper with a polynomial — even by changing just one coefficient — without
+              corrupting at least 9 of the 16 evaluation points. More coefficients changed means
+              even more corruption. This is the fundamental reason RS-based proof systems work:
+              cheating is <em>amplified</em> into widespread, easily detectable corruption.
+            </p>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function CostComparison({ traceRows }: { traceRows: number }) {
   const [securityBits, setSecurityBits] = useState(100);
 
@@ -231,10 +445,11 @@ export function S3_ReedSolomon() {
         From Error Correction to Proof Systems
       </h3>
       <p>
-        In traditional applications (QR codes, DVDs), Reed-Solomon codes correct accidental
-        errors. In proof systems like leanVM, they serve a different but related purpose:
-        they let a verifier <strong>catch a cheating prover</strong>. The key insight is the
-        same — redundancy makes tampering detectable.
+        In traditional applications (QR codes, DVDs), Reed-Solomon codes <em>correct</em> errors —
+        the receiver recovers the original data. leanVM and WHIR only need the weaker property
+        of <em>detection</em>: the verifier doesn't fix anything, it just checks whether the
+        prover's data is close to a valid polynomial and rejects if it isn't. Detection is cheaper
+        than correction, which is part of why WHIR can get away with reading so few points.
       </p>
       <p className="mt-3">
         In <strong>leanVM</strong>, the prover evaluates each column polynomial over a domain much
@@ -245,6 +460,8 @@ export function S3_ReedSolomon() {
         guarantees that the corruption is spread across many positions — making it easy for WHIR
         to catch by checking just a tiny random sample.
       </p>
+
+      <CheatingDemo />
 
       <div className="bg-bg-card border border-border rounded-lg p-5 my-6">
         <p className="text-sm text-text-muted">
