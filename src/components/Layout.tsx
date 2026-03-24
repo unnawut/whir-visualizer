@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
-const sections = [
+export const SECTIONS = [
   { id: 'problem', label: 'What Problem Does WHIR Solve?' },
   { id: 'code-to-polynomials', label: 'From Code to Polynomials' },
   { id: 'reed-solomon', label: 'Reed-Solomon Codes' },
@@ -13,49 +13,27 @@ const sections = [
 ];
 
 interface LayoutProps {
+  activePage: number;
+  onNavigate: (index: number) => void;
   children: ReactNode;
 }
 
-export function Layout({ children }: LayoutProps) {
-  const [activeId, setActiveId] = useState<string>(sections[0].id);
+export function Layout({ activePage, onNavigate, children }: LayoutProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const handleIntersect = useCallback((entries: IntersectionObserverEntry[]) => {
-    // Find the topmost visible section
-    const visible = entries
-      .filter((e) => e.isIntersecting)
-      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-
-    if (visible.length > 0) {
-      setActiveId(visible[0].target.id);
-    }
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleIntersect, {
-      rootMargin: '-10% 0px -80% 0px',
-      threshold: 0,
-    });
-
-    sections.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [handleIntersect]);
 
   const navLinks = (
     <nav className="flex flex-col gap-0.5">
-      {sections.map(({ id, label }, i) => {
-        const isActive = activeId === id;
+      {SECTIONS.map(({ id, label }, i) => {
+        const isActive = activePage === i;
         return (
-          <a
+          <button
             key={id}
-            href={`#${id}`}
-            onClick={() => setMenuOpen(false)}
+            onClick={() => {
+              onNavigate(i);
+              setMenuOpen(false);
+            }}
             className={`
-              block px-4 py-2 text-sm leading-snug rounded-r-md transition-colors
+              cursor-pointer block w-full text-left px-4 py-2 text-sm leading-snug rounded-r-md transition-colors
               border-l-2
               ${
                 isActive
@@ -66,7 +44,7 @@ export function Layout({ children }: LayoutProps) {
           >
             <span className="text-xs text-text-muted mr-1.5">{i + 1}.</span>
             {label}
-          </a>
+          </button>
         );
       })}
     </nav>
@@ -116,6 +94,9 @@ export function Layout({ children }: LayoutProps) {
           </svg>
         </button>
         <h1 className="font-heading text-xl font-bold text-navy ml-3">WHIR</h1>
+        <span className="ml-auto text-xs text-text-muted font-mono">
+          {activePage + 1} / {SECTIONS.length}
+        </span>
       </header>
 
       {/* Mobile menu overlay */}
