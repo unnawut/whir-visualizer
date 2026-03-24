@@ -19,15 +19,16 @@ export function S0_Introduction() {
       <p className="mt-3">
         Ethereum's consensus layer currently relies on BLS signatures for validator attestations.
         BLS is efficient and supports cheap aggregation, but it is vulnerable to quantum computers.
-        The migration path leads to hash-based signatures like <strong>leanXMSS</strong>, which are
-        quantum-resistant but 10-100x larger than BLS and lack native aggregation. leanVM is a
+        The migration path leads to hash-based signatures like{' '}
+        <a href="https://github.com/leanEthereum/leanSig" target="_blank" rel="noopener noreferrer" className="text-sienna hover:underline font-semibold">leanSig</a>,
+        which are quantum-resistant but 10-100x larger than BLS and lack native aggregation. leanVM is a
         minimal zkVM that aggregates thousands of these signatures into a single compact proof using
         a hash-based SNARK powered by WHIR.
       </p>
       <p className="mt-3">
         WHIR is the component that makes leanVM's verifier fast enough for on-chain verification
         and recursive proof composition. Its super-fast verification time — hundreds of microseconds
-        — is what enables a tree of recursive proofs to aggregate batches of leanXMSS signatures
+        — is what enables a tree of recursive proofs to aggregate batches of leanSig signatures
         into one final proof that Ethereum validators can check cheaply.
       </p>
       <p className="mt-3">

@@ -9,7 +9,7 @@ const stages = [
     label: 'Computation',
     color: '#1a365d',
     description:
-      'leanVM executes a program that verifies leanXMSS signatures. The execution trace records every step: ADD, MUL, DEREF, JUMP instructions plus Poseidon2 hashes. A batch of 2,500 signatures produces millions of rows — but the prover wants to convince everyone the result is correct without making them redo the entire thing.',
+      'leanVM executes a program that verifies leanSig signatures. The execution trace records every step: ADD, MUL, DEREF, JUMP instructions plus Poseidon2 hashes. A batch of 2,500 signatures produces millions of rows — but the prover wants to convince everyone the result is correct without making them redo the entire thing.',
   },
   {
     id: 'piop',
@@ -31,7 +31,7 @@ const stages = [
     label: 'SNARG',
     color: '#1a365d',
     description:
-      'The final product: a Succinct Non-interactive ARGument. This is a short proof that anyone can verify quickly without any interaction with the prover. For leanVM, this means thousands of leanXMSS signature verifications are compressed into a single proof that Ethereum validators check in under a millisecond — replacing the enormous cost of verifying each hash-based signature individually.',
+      'The final product: a Succinct Non-interactive ARGument. This is a short proof that anyone can verify quickly without any interaction with the prover. For leanVM, this means thousands of leanSig signature verifications are compressed into a single proof that Ethereum validators check in under a millisecond — replacing the enormous cost of verifying each hash-based signature individually.',
   },
 ];
 
@@ -63,15 +63,16 @@ export function S1_WhatProblem() {
         signatures will be forgeable, breaking Ethereum's consensus security.
       </p>
       <p className="mt-3">
-        The post-quantum alternative is <strong>leanXMSS</strong>, a hash-based signature scheme
-        that is secure against quantum attacks. But leanXMSS signatures are large (several KB each)
+        The post-quantum alternative is{' '}
+        <a href="https://github.com/leanEthereum/leanSig" target="_blank" rel="noopener noreferrer" className="text-sienna hover:underline font-semibold">leanSig</a>, a hash-based signature scheme
+        that is secure against quantum attacks. But leanSig signatures are large (several KB each)
         and expensive to verify — each requires thousands of hash evaluations. With no native
         aggregation, verifying <InlineMath tex="N" /> signatures costs <InlineMath tex="O(N)" /> work.
         For Ethereum's 800,000+ validators, this is prohibitive.
       </p>
       <p className="mt-3">
         <strong>leanVM</strong> solves this. It is a minimal zkVM that aggregates thousands of
-        leanXMSS signatures into a single compact proof using a hash-based SNARG. WHIR is the
+        leanSig signatures into a single compact proof using a hash-based SNARG. WHIR is the
         polynomial commitment scheme inside leanVM that makes verification fast enough for on-chain
         checking and recursive proof composition.
       </p>
@@ -99,7 +100,7 @@ export function S1_WhatProblem() {
       <p>
         Building a SNARG involves a pipeline of transformations. Each stage converts one kind of
         problem into another, until we arrive at a short, easily-checked proof. In leanVM, this
-        pipeline turns leanXMSS signature verifications into a compact proof. Click each stage
+        pipeline turns leanSig signature verifications into a compact proof. Click each stage
         below to learn more:
       </p>
 
@@ -236,7 +237,7 @@ export function S1_WhatProblem() {
             Prover
           </div>
           <p className="text-sm text-text-muted">
-            Runs leanVM to verify a batch of leanXMSS signatures. Generates an execution trace
+            Runs leanVM to verify a batch of leanSig signatures. Generates an execution trace
             (up to <InlineMath tex="2^{25}" /> rows, 20 columns), commits it via WHIR, and
             produces a proof. Might be dishonest — tries to convince the verifier of false claims.
           </p>
@@ -265,17 +266,17 @@ export function S1_WhatProblem() {
         <p className="text-sm text-text-muted mb-3">
           Ethereum currently relies on BLS signatures for validator attestations. BLS allows cheap
           aggregation — thousands of signatures compress into one — but BLS is broken by quantum
-          computers. The post-quantum replacement is <strong>leanXMSS</strong>, a hash-based
+          computers. The post-quantum replacement is <strong>leanSig</strong>, a hash-based
           signature scheme that is quantum-resistant but has a problem:
         </p>
         <ul className="list-disc list-inside text-sm text-text-muted space-y-1 mb-4">
-          <li>Each leanXMSS signature is several KB (vs. 48 bytes for BLS)</li>
+          <li>Each leanSig signature is several KB (vs. 48 bytes for BLS)</li>
           <li>Verification requires thousands of hash evaluations per signature</li>
           <li>No native aggregation — verifying <InlineMath tex="N" /> signatures costs <InlineMath tex="O(N)" /> work</li>
         </ul>
         <p className="text-sm text-text-muted mb-3">
           leanVM solves this with <strong>recursive aggregation</strong>. As described in the
-          leanVM paper, the process works as a tree: batches of ~2,500 leanXMSS signatures are
+          leanVM paper, the process works as a tree: batches of ~2,500 leanSig signatures are
           each verified by a leanVM instance that produces a proof. These proofs are then merged
           pairwise up the tree until a single final proof remains. Each node verifies this one
           compact proof instead of tens of thousands of individual signatures.
@@ -292,7 +293,7 @@ export function S1_WhatProblem() {
           <div className="flex-1 bg-bg border border-border-light rounded p-3">
             <div className="text-xs font-semibold text-red mb-1">Without leanVM</div>
             <p className="text-xs text-text-muted">
-              Every node verifies 10,000+ leanXMSS signatures individually.
+              Every node verifies 10,000+ leanSig signatures individually.
               Costs millions of hash operations per block.
             </p>
           </div>

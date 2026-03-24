@@ -284,7 +284,7 @@ export function S9_Performance() {
           <p className="text-sm text-text-muted">
             WHIR is hash-based — it requires no trusted setup ceremony and no
             pairing-friendly curves. This gives leanVM the same trust model as its
-            leanXMSS post-quantum signatures: security depends only on the collision
+            leanSig post-quantum signatures: security depends only on the collision
             resistance of the hash function, making the entire system post-quantum secure.
           </p>
         </div>

@@ -122,7 +122,7 @@ function CostComparison({ traceRows }: { traceRows: number }) {
           The verifier reads a tiny fraction of the data and is still overwhelmingly confident.
         </p>
         <p>
-          In leanVM, this means the on-chain verifier can confirm that a batch of leanXMSS
+          In leanVM, this means the on-chain verifier can confirm that a batch of leanSig
           signature verifications was performed correctly by reading ~{whirQueries} field
           elements instead of re-running all 2<sup>{traceRows}</sup> execution steps.
         </p>
@@ -187,29 +187,63 @@ export function S3_ReedSolomon() {
         What Are Reed-Solomon Codes?
       </h3>
       <p>
-        A <strong>Reed-Solomon code</strong> takes a polynomial and evaluates it at many more
-        points than its degree requires. If the polynomial has degree{' '}
-        <InlineMath tex="d" />, we only need <InlineMath tex="d+1" /> points to determine
-        it uniquely. By evaluating at <InlineMath tex="n \gg d" /> points, we create
-        <em> redundancy</em>.
+        <strong>Reed-Solomon codes</strong> are one of the most widely used error-correcting codes
+        in the real world. Invented in 1960, they protect data by adding structured redundancy —
+        extra information that lets you detect and even correct errors.
+      </p>
+      <p className="mt-3">
+        You encounter Reed-Solomon codes every day without knowing it:
+      </p>
+      <ul className="list-disc list-inside text-text-muted mt-2 space-y-1 text-sm">
+        <li><strong>QR codes</strong> — still scannable even when partially covered or damaged</li>
+        <li><strong>CDs and DVDs</strong> — play correctly despite scratches on the disc surface</li>
+        <li><strong>Satellite and deep-space communication</strong> — NASA uses RS codes to recover data transmitted across billions of miles</li>
+        <li><strong>Digital television (DVB)</strong> — maintains picture quality despite noisy broadcast signals</li>
+      </ul>
+      <p className="mt-3">
+        The core idea is simple: instead of sending just the data, you send <em>more</em> data
+        than strictly necessary. This redundancy means that even if some values are corrupted
+        in transit, the receiver can detect — and often fix — the errors.
+      </p>
+
+      <h3 id="polynomials-and-redundancy" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
+        How Reed-Solomon Codes Work
+      </h3>
+      <p>
+        A Reed-Solomon code works by treating data as the coefficients of a polynomial, then
+        evaluating that polynomial at many more points than its degree requires. If the polynomial
+        has degree <InlineMath tex="d" />, we only need <InlineMath tex="d+1" /> points to
+        determine it uniquely. By evaluating at <InlineMath tex="n \gg d" /> points, we
+        create <em>redundancy</em>.
       </p>
 
       <MathBlock tex="\text{RS}[n, d] = \{ (f(\omega^0), f(\omega^1), \ldots, f(\omega^{n-1})) \mid \deg(f) < d \}" />
 
       <p>
-        This redundancy is powerful: if someone gives you a vector of <InlineMath tex="n" />{' '}
-        values and claims it is a valid codeword, you can detect if they have tampered with
-        any of the values. The minimum number of positions where two distinct codewords differ
-        is called the <strong>Hamming distance</strong>.
+        Because any polynomial of degree <InlineMath tex="{'<'} d" /> is fully determined
+        by <InlineMath tex="d" /> points, two different valid codewords must differ in
+        at least <InlineMath tex="n - d + 1" /> positions. This gap is what makes error
+        detection possible — if only a few values are wrong, the corrupted vector cannot
+        be close to <em>any</em> valid codeword.
       </p>
 
-      <p className="mt-4">
+      <h3 id="error-correction-to-proofs" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
+        From Error Correction to Proof Systems
+      </h3>
+      <p>
+        In traditional applications (QR codes, DVDs), Reed-Solomon codes correct accidental
+        errors. In proof systems like leanVM, they serve a different but related purpose:
+        they let a verifier <strong>catch a cheating prover</strong>. The key insight is the
+        same — redundancy makes tampering detectable.
+      </p>
+      <p className="mt-3">
         In <strong>leanVM</strong>, the prover evaluates each column polynomial over a domain much
         larger than the execution trace. With a rate of{' '}
         <InlineMath tex="\rho = 1/2" />, a trace of <InlineMath tex="2^{25}" /> rows means
-        evaluating over <InlineMath tex="2^{26}" /> domain points. This Reed-Solomon encoding
-        is what gives the verifier the ability to detect cheating without reading the entire trace --
-        WHIR only needs to query a tiny fraction of these evaluations to be convinced.
+        evaluating over <InlineMath tex="2^{26}" /> domain points. If the prover tries to cheat
+        by sending values that don't correspond to a valid low-degree polynomial, the RS encoding
+        guarantees that the corruption is spread across many positions — making it easy for WHIR
+        to catch by checking just a tiny random sample.
       </p>
 
       <div className="bg-bg-card border border-border rounded-lg p-5 my-6">

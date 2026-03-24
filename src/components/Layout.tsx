@@ -35,6 +35,8 @@ export const SECTIONS = [
     label: 'Reed-Solomon Codes',
     subs: [
       { label: 'What Are Reed-Solomon Codes?', id: 'what-are-rs-codes' },
+      { label: 'How Reed-Solomon Codes Work', id: 'polynomials-and-redundancy' },
+      { label: 'Error Correction to Proofs', id: 'error-correction-to-proofs' },
       { label: 'Polynomial Explorer', id: 'polynomial-explorer' },
       { label: 'Hamming Distance', id: 'hamming-distance' },
       { label: 'Why Redundancy Matters', id: 'why-redundancy-matters' },
