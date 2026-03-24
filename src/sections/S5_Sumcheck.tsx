@@ -98,7 +98,7 @@ export function S5_Sumcheck() {
         </div>
       </div>
 
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-4">
+      <h3 id="sumcheck-step-by-step" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
         Step-by-Step Example
       </h3>
       <p className="mb-4">

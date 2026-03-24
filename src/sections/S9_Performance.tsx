@@ -110,7 +110,7 @@ export function S9_Performance() {
         </div>
       </div>
 
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-4">
+      <h3 id="benchmark-comparison" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
         Benchmark Comparison
       </h3>
       <p className="mb-4">
@@ -242,7 +242,7 @@ export function S9_Performance() {
       </div>
 
       {/* Key takeaways */}
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-4">
+      <h3 id="key-takeaways" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
         Key Takeaways
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

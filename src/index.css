@@ -39,6 +39,10 @@ h1, h2, h3, h4 {
   line-height: 1.3;
 }
 
+h3[id] {
+  scroll-margin-top: 5rem;
+}
+
 /* KaTeX overrides for consistent sizing */
 .katex { font-size: 1.05em; }
 .katex-display { margin: 1.2em 0; }

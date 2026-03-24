@@ -58,7 +58,7 @@ export function S2_FromCodeToPolynomials() {
         "arithmetization" step -- it's how the real world connects to the abstract math.
       </p>
 
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-3">
+      <h3 id="run-the-program" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
         Step 1: Run the Program, Record Everything
       </h3>
       <p>
@@ -134,7 +134,7 @@ export function S2_FromCodeToPolynomials() {
       </p>
 
       {/* Step 2: Columns become polynomials */}
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-3">
+      <h3 id="columns-become-polynomials" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
         Step 2: Columns Become Polynomials
       </h3>
       <p>
@@ -212,7 +212,7 @@ export function S2_FromCodeToPolynomials() {
       <MathBlock tex="p_A(x), \; p_B(x), \; p_C(x) \quad \text{are polynomials of degree} < T = 5" />
 
       {/* Step 3: Constraints become polynomial identities */}
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-3">
+      <h3 id="constraints-become-identities" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
         Step 3: Constraints Become Polynomial Identities
       </h3>
       <p className="mb-4">
@@ -239,7 +239,7 @@ export function S2_FromCodeToPolynomials() {
       </p>
 
       {/* Step 4: Interactive walkthrough */}
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-3">
+      <h3 id="big-picture" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
         The Big Picture
       </h3>
 

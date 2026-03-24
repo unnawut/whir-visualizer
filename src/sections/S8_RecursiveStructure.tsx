@@ -44,7 +44,7 @@ export function S8_RecursiveStructure() {
 
       <MathBlock tex="\text{Domain size: } 2^m \xrightarrow{\text{iter 1}} 2^{m-k} \xrightarrow{\text{iter 2}} 2^{m-2k} \xrightarrow{\cdots} 2^0 = 1" />
 
-      <h3 className="font-heading text-xl font-semibold text-text mt-8 mb-4">
+      <h3 id="funnel-visualization" className="font-heading text-xl font-semibold text-text mt-8 mb-4">
         Funnel Visualization
       </h3>
       <p className="mb-4">
@@ -157,7 +157,7 @@ export function S8_RecursiveStructure() {
       </div>
 
       {/* Tradeoff explanation */}
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-3">
+      <h3 id="k-tradeoff" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
         The k Tradeoff
       </h3>
 

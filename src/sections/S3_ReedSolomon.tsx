@@ -86,7 +86,7 @@ export function S3_ReedSolomon() {
       </div>
 
       {/* Interactive A: Polynomial Explorer */}
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-4">
+      <h3 id="polynomial-explorer" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
         Polynomial Explorer
       </h3>
       <p className="mb-4">
@@ -247,7 +247,7 @@ export function S3_ReedSolomon() {
       </div>
 
       {/* Interactive B: Hamming Distance */}
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-4">
+      <h3 id="hamming-distance" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
         Hamming Distance
       </h3>
       <p className="mb-4">

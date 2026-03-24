@@ -1,16 +1,14 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import { Layout, SECTIONS } from './components/Layout'
-
-// Lazy-load each section for code splitting
-const S1_WhatProblem = lazy(() => import('./sections/S1_WhatProblem').then(m => ({ default: m.S1_WhatProblem })))
-const S2_FromCodeToPolynomials = lazy(() => import('./sections/S2_FromCodeToPolynomials').then(m => ({ default: m.S2_FromCodeToPolynomials })))
-const S3_ReedSolomon = lazy(() => import('./sections/S3_ReedSolomon').then(m => ({ default: m.S3_ReedSolomon })))
-const S4_ConstrainedRS = lazy(() => import('./sections/S4_ConstrainedRS').then(m => ({ default: m.S4_ConstrainedRS })))
-const S5_Sumcheck = lazy(() => import('./sections/S5_Sumcheck').then(m => ({ default: m.S5_Sumcheck })))
-const S6_Folding = lazy(() => import('./sections/S6_Folding').then(m => ({ default: m.S6_Folding })))
-const S7_WhirIteration = lazy(() => import('./sections/S7_WhirIteration').then(m => ({ default: m.S7_WhirIteration })))
-const S8_RecursiveStructure = lazy(() => import('./sections/S8_RecursiveStructure').then(m => ({ default: m.S8_RecursiveStructure })))
-const S9_Performance = lazy(() => import('./sections/S9_Performance').then(m => ({ default: m.S9_Performance })))
+import { S1_WhatProblem } from './sections/S1_WhatProblem'
+import { S2_FromCodeToPolynomials } from './sections/S2_FromCodeToPolynomials'
+import { S3_ReedSolomon } from './sections/S3_ReedSolomon'
+import { S4_ConstrainedRS } from './sections/S4_ConstrainedRS'
+import { S5_Sumcheck } from './sections/S5_Sumcheck'
+import { S6_Folding } from './sections/S6_Folding'
+import { S7_WhirIteration } from './sections/S7_WhirIteration'
+import { S8_RecursiveStructure } from './sections/S8_RecursiveStructure'
+import { S9_Performance } from './sections/S9_Performance'
 
 const SECTION_COMPONENTS = [
   S1_WhatProblem,
@@ -24,19 +22,13 @@ const SECTION_COMPONENTS = [
   S9_Performance,
 ]
 
-function getPageFromHash(): number {
-  const hash = window.location.hash.replace('#', '')
-  if (!hash) return 0
-  const idx = SECTIONS.findIndex(s => s.id === hash)
-  return idx >= 0 ? idx : 0
-}
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') // e.g. "/whir-visualizer"
 
-function LoadingSpinner() {
-  return (
-    <div className="flex items-center justify-center py-32">
-      <div className="w-8 h-8 border-2 border-sienna/30 border-t-sienna rounded-full animate-spin" />
-    </div>
-  )
+function getPageFromPath(): number {
+  const path = window.location.pathname.replace(BASE, '').replace(/^\//, '').replace(/\/$/, '')
+  if (!path) return 0
+  const idx = SECTIONS.findIndex(s => s.id === path)
+  return idx >= 0 ? idx : 0
 }
 
 function PageNav({ page, navigateTo, borderSide }: { page: number; navigateTo: (i: number) => void; borderSide: 'top' | 'bottom' }) {
@@ -87,16 +79,18 @@ function PageNav({ page, navigateTo, borderSide }: { page: number; navigateTo: (
 }
 
 export default function App() {
-  const [page, setPage] = useState(getPageFromHash)
+  const [page, setPage] = useState(getPageFromPath)
 
   useEffect(() => {
-    const onHashChange = () => setPage(getPageFromHash())
-    window.addEventListener('hashchange', onHashChange)
-    return () => window.removeEventListener('hashchange', onHashChange)
+    const onPopState = () => setPage(getPageFromPath())
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
   }, [])
 
   const navigateTo = (index: number) => {
-    window.location.hash = SECTIONS[index].id
+    const path = index === 0 ? `${BASE}/` : `${BASE}/${SECTIONS[index].id}`
+    window.history.pushState(null, '', path)
+    setPage(index)
     window.scrollTo(0, 0)
   }
 
@@ -145,9 +139,7 @@ export default function App() {
         </div>
       </div>
 
-      <Suspense fallback={<LoadingSpinner />}>
-        <ActiveSection />
-      </Suspense>
+      <ActiveSection />
 
       {/* Bottom page navigation */}
       <div className="pb-16 pt-8">

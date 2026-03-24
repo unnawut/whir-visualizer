@@ -125,7 +125,7 @@ export function S6_Folding() {
         </p>
       </div>
 
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-4">
+      <h3 id="interactive-folding" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
         Interactive Folding
       </h3>
       <p className="mb-2">

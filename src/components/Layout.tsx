@@ -1,15 +1,76 @@
 import { useState, type ReactNode } from 'react';
 
 export const SECTIONS = [
-  { id: 'problem', label: 'What Problem Does WHIR Solve?' },
-  { id: 'code-to-polynomials', label: 'From Code to Polynomials' },
-  { id: 'reed-solomon', label: 'Reed-Solomon Codes' },
-  { id: 'constrained-rs', label: 'Constrained Reed-Solomon Codes' },
-  { id: 'sumcheck', label: 'The Sumcheck Protocol' },
-  { id: 'folding', label: 'Folding' },
-  { id: 'one-iteration', label: 'One WHIR Iteration' },
-  { id: 'full-protocol', label: 'The Full Protocol' },
-  { id: 'why-fast', label: 'Why WHIR is Fast' },
+  {
+    id: 'problem',
+    label: 'What Problem Does WHIR Solve?',
+    subs: [
+      { label: 'The Prover-Verifier Model', id: 'prover-verifier-model' },
+      { label: 'Why Does Fast Verification Matter?', id: 'why-fast-verification' },
+      { label: 'The Road to WHIR', id: 'road-to-whir' },
+    ],
+  },
+  {
+    id: 'code-to-polynomials',
+    label: 'From Code to Polynomials',
+    subs: [
+      { label: 'Run the Program, Record Everything', id: 'run-the-program' },
+      { label: 'Columns Become Polynomials', id: 'columns-become-polynomials' },
+      { label: 'Constraints Become Polynomial Identities', id: 'constraints-become-identities' },
+      { label: 'The Big Picture', id: 'big-picture' },
+    ],
+  },
+  {
+    id: 'reed-solomon',
+    label: 'Reed-Solomon Codes',
+    subs: [
+      { label: 'Polynomial Explorer', id: 'polynomial-explorer' },
+      { label: 'Hamming Distance', id: 'hamming-distance' },
+    ],
+  },
+  {
+    id: 'constrained-rs',
+    label: 'Constrained Reed-Solomon Codes',
+    subs: [
+      { label: 'Why Add a Constraint?', id: 'why-add-constraint' },
+      { label: 'Interactive Example', id: 'crs-interactive-example' },
+    ],
+  },
+  {
+    id: 'sumcheck',
+    label: 'The Sumcheck Protocol',
+    subs: [
+      { label: 'Step-by-Step Example', id: 'sumcheck-step-by-step' },
+    ],
+  },
+  {
+    id: 'folding',
+    label: 'Folding',
+    subs: [
+      { label: 'Interactive Folding', id: 'interactive-folding' },
+    ],
+  },
+  {
+    id: 'one-iteration',
+    label: 'One WHIR Iteration',
+    subs: [],
+  },
+  {
+    id: 'full-protocol',
+    label: 'The Full Protocol',
+    subs: [
+      { label: 'Funnel Visualization', id: 'funnel-visualization' },
+      { label: 'The k Tradeoff', id: 'k-tradeoff' },
+    ],
+  },
+  {
+    id: 'why-fast',
+    label: 'Why WHIR is Fast',
+    subs: [
+      { label: 'Benchmark Comparison', id: 'benchmark-comparison' },
+      { label: 'Key Takeaways', id: 'key-takeaways' },
+    ],
+  },
 ];
 
 interface LayoutProps {
@@ -23,28 +84,43 @@ export function Layout({ activePage, onNavigate, children }: LayoutProps) {
 
   const navLinks = (
     <nav className="flex flex-col gap-0.5">
-      {SECTIONS.map(({ id, label }, i) => {
+      {SECTIONS.map(({ id, label, subs }, i) => {
         const isActive = activePage === i;
         return (
-          <button
-            key={id}
-            onClick={() => {
-              onNavigate(i);
-              setMenuOpen(false);
-            }}
-            className={`
-              cursor-pointer block w-full text-left px-4 py-2 text-sm leading-snug rounded-r-md transition-colors
-              border-l-2
-              ${
-                isActive
-                  ? 'border-sienna text-sienna font-medium bg-sienna/5'
-                  : 'border-transparent text-text-muted hover:text-text hover:border-border'
-              }
-            `}
-          >
-            <span className="text-xs text-text-muted mr-1.5">{i + 1}.</span>
-            {label}
-          </button>
+          <div key={id}>
+            <button
+              onClick={() => {
+                onNavigate(i);
+                setMenuOpen(false);
+              }}
+              className={`
+                cursor-pointer block w-full text-left px-4 py-2 text-sm leading-snug rounded-r-md transition-colors
+                border-l-2
+                ${
+                  isActive
+                    ? 'border-sienna text-sienna font-medium bg-sienna/5'
+                    : 'border-transparent text-text-muted hover:text-text hover:border-border'
+                }
+              `}
+            >
+              <span className="text-xs text-text-muted mr-1.5">{i + 1}.</span>
+              {label}
+            </button>
+            {isActive && subs.length > 0 && (
+              <div className="ml-7 border-l border-border-light">
+                {subs.map((sub) => (
+                  <a
+                    key={sub.id}
+                    href={`#${sub.id}`}
+                    onClick={() => setMenuOpen(false)}
+                    className="cursor-pointer block pl-3 py-1 text-[11px] leading-snug text-text-muted/70 hover:text-sienna transition-colors"
+                  >
+                    {sub.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
         );
       })}
     </nav>
@@ -67,7 +143,7 @@ export function Layout({ activePage, onNavigate, children }: LayoutProps) {
       <header className="md:hidden fixed top-0 left-0 right-0 h-14 bg-bg-card border-b border-border-light z-30 flex items-center px-4">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="p-2 -ml-2 text-text hover:text-sienna transition-colors"
+          className="cursor-pointer p-2 -ml-2 text-text hover:text-sienna transition-colors"
           aria-label="Toggle menu"
         >
           <svg

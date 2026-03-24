@@ -207,7 +207,7 @@ export function S1_WhatProblem() {
       </AnimatePresence>
 
       {/* Prover-Verifier model */}
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-3">
+      <h3 id="prover-verifier-model" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
         The Prover-Verifier Model
       </h3>
       <p>
@@ -240,7 +240,7 @@ export function S1_WhatProblem() {
       </div>
 
       {/* Why it matters */}
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-3">
+      <h3 id="why-fast-verification" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
         Why Does Fast Verification Matter?
       </h3>
 
@@ -292,7 +292,7 @@ export function S1_WhatProblem() {
       </div>
 
       {/* Prior Art */}
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-3">
+      <h3 id="road-to-whir" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
         The Road to WHIR: Prior Proof Systems
       </h3>
       <p className="mb-4">

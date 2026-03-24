@@ -76,7 +76,7 @@ export function S4_ConstrainedRS() {
         </div>
       </div>
 
-      <h3 className="font-heading text-xl font-semibold text-text mt-8 mb-3">
+      <h3 id="why-add-constraint" className="font-heading text-xl font-semibold text-text mt-8 mb-3">
         Why Add a Constraint?
       </h3>
       <p>
@@ -96,7 +96,7 @@ export function S4_ConstrainedRS() {
         exactly checks that <InlineMath tex="\hat{f}(z) = v" />.
       </p>
 
-      <h3 className="font-heading text-xl font-semibold text-text mt-10 mb-4">
+      <h3 id="crs-interactive-example" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
         Interactive Example
       </h3>
       <p className="mb-4">
