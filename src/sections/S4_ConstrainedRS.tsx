@@ -38,12 +38,14 @@ export function S4_ConstrainedRS() {
       </h3>
       <p>
         Standard Reed-Solomon codes only check one thing: "is this close to a low-degree
-        polynomial?" But leanVM needs more than that. Its execution trace must satisfy AIR
-        transition constraints — for example, an ADD instruction requires that{' '}
-        <InlineMath tex="\nu_B = \nu_A + \nu_C" />. <strong>Constrained Reed-Solomon
-        (CRS)</strong> codes bundle both checks into one: proximity testing <em>and</em>{' '}
-        constraint satisfaction. This is why WHIR was chosen for leanVM — it handles
-        constrained RS codes natively, unlike FRI which only does proximity testing.
+        polynomial?" But leanVM also needs to verify that the execution trace satisfies AIR
+        transition constraints — for example, when the instruction is ADD, the
+        constraint <InlineMath tex="\nu_B - (\nu_A + \nu_C) = 0" /> must hold.
+        FRI-based systems handle these as <em>separate steps</em>: FRI does proximity testing,
+        and a different mechanism checks the constraints. <strong>Constrained Reed-Solomon
+        (CRS)</strong> codes bundle both into a single test — and WHIR is an IOP of proximity
+        for CRS codes, which is why leanVM uses it: proximity testing and constraint
+        satisfaction are verified together in one protocol.
       </p>
 
       <MathBlock tex="\text{CRS}[L, d, \hat{w}, \sigma] = \left\{ \hat{f} \in \text{RS}[L, d] \ \middle|\ \sum_{b \in \{0,1\}^m} \hat{w}(\hat{f}(b), b) = \sigma \right\}" />
