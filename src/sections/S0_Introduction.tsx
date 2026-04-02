@@ -6,7 +6,7 @@ export function S0_Introduction() {
     <Section
       id="introduction"
       title="About"
-      subtitle="An interactive guide to understanding the WHIR protocol — the polynomial commitment scheme inside LeanMultisig."
+      subtitle="An interactive guide to understanding the WHIR protocol — the polynomial commitment scheme inside leanMultisig."
     >
       <h3 id="about-this-visualizer" className="font-heading text-xl font-semibold text-text mb-3">
         About This Visualizer
@@ -26,7 +26,7 @@ export function S0_Introduction() {
         a hash-based SNARK powered by WHIR.
       </p>
       <p className="mt-3">
-        WHIR is the component that makes LeanMultisig's verifier fast enough for on-chain verification
+        WHIR is the component that makes leanMultisig's verifier fast enough for on-chain verification
         and recursive proof composition. Its super-fast verification time — hundreds of microseconds
         — is what enables a tree of recursive proofs to aggregate batches of leanSig signatures
         into one final proof that Ethereum validators can check cheaply.
@@ -43,7 +43,7 @@ export function S0_Introduction() {
       <p>
         Throughout this site, interactive demos let you explore the math hands-on. To keep
         things readable, all demos operate over a small finite field rather than the large
-        fields used in LeanMultisig's production implementation.
+        fields used in leanMultisig's production implementation.
       </p>
 
       <div className="bg-bg-card border border-border rounded-lg p-5 my-6 space-y-4">
@@ -53,11 +53,11 @@ export function S0_Introduction() {
           </div>
           <p className="text-sm text-text-muted">
             The demos use <InlineMath tex="\mathbb{F}_{17}" /> (arithmetic modulo the
-            prime <InlineMath tex="p = 17" />) for readability. In LeanMultisig, the field
+            prime <InlineMath tex="p = 17" />) for readability. In leanMultisig, the field
             is the <strong>KoalaBear prime</strong>{' '}
             <InlineMath tex="p = 2^{31} - 2^{24} + 1" />, which fits in a single{' '}
             <code>u32</code> and enables an efficient Poseidon2 S-box via the cubing
-            map <InlineMath tex="x \mapsto x^3" />. For 128-bit security in WHIR, LeanMultisig works
+            map <InlineMath tex="x \mapsto x^3" />. For 128-bit security in WHIR, leanMultisig works
             over the degree-5 extension field <InlineMath tex="\mathbb{F}_{p^5}" />.
           </p>
         </div>
@@ -72,7 +72,7 @@ export function S0_Introduction() {
             <InlineMath tex="3^{16} \equiv 1 \pmod{17}" />). This gives us subgroups of size
             16, 8, 4, and 2 — perfect for demonstrating the repeated domain halving that WHIR
             relies on. The demos typically start with a domain of size 8 and fold down to 4,
-            then 2. In LeanMultisig, the KoalaBear field has a much larger multiplicative group,
+            then 2. In leanMultisig, the KoalaBear field has a much larger multiplicative group,
             enabling commitment domains of up to <InlineMath tex="2^{30}" /> elements.
           </p>
         </div>
@@ -88,7 +88,7 @@ export function S0_Introduction() {
             <InlineMath tex="[2, 5, 3]" /> and evaluations are computed via Horner's method.
             Multilinear polynomials (used in the sumcheck demos) are stored as their{' '}
             <InlineMath tex="2^m" /> evaluations over the boolean hypercube{' '}
-            <InlineMath tex="\{0,1\}^m" />. In LeanMultisig, execution traces have up
+            <InlineMath tex="\{0,1\}^m" />. In leanMultisig, execution traces have up
             to <InlineMath tex="2^{25}" /> rows with 20 committed columns per cycle — these
             are encoded as multilinear polynomials and committed via WHIR.
           </p>

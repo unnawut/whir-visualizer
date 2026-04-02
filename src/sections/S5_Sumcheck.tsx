@@ -59,13 +59,13 @@ export function S5_Sumcheck() {
         How Sumcheck Works
       </h3>
       <p>
-        In LeanMultisig, the prover needs to convince the verifier that AIR constraints hold
+        In leanMultisig, the prover needs to convince the verifier that AIR constraints hold
         on <em>all</em> <InlineMath tex="2^{25}" /> rows of the execution trace. Checking
         every row individually is far too expensive. The <strong>sumcheck protocol</strong>{' '}
         solves this by reducing an exponential-size sum to a <em>single</em> random
         evaluation. Inside WHIR, sumcheck is used in each iteration to reduce the CRS
         constraint to a simpler one. It also enables batching: as described in Section 3.7
-        of the LeanMultisig paper, multiple polynomial claims can be combined into one via
+        of the leanMultisig paper, multiple polynomial claims can be combined into one via
         sumcheck queries over stacked multilinear polynomials.
       </p>
 
@@ -108,7 +108,7 @@ export function S5_Sumcheck() {
       </h3>
       <p className="mb-4">
         Below we walk through sumcheck on a tiny 2-variable polynomial in{' '}
-        <InlineMath tex="\mathbb{F}_{17}" />. In LeanMultisig, the same protocol runs on
+        <InlineMath tex="\mathbb{F}_{17}" />. In leanMultisig, the same protocol runs on
         polynomials with 25+ variables, reducing <InlineMath tex="2^{25}" /> constraint
         checks to a single evaluation. Use the arrows to step through.
       </p>
@@ -370,10 +370,10 @@ export function S5_Sumcheck() {
         <p className="text-sm text-text-muted">
           Instead of checking <InlineMath tex="2^m" /> evaluations, the verifier only
           exchanges <InlineMath tex="m" /> messages and evaluates{' '}
-          <InlineMath tex="f" /> at <strong>one</strong> point. In LeanMultisig with{' '}
+          <InlineMath tex="f" /> at <strong>one</strong> point. In leanMultisig with{' '}
           <InlineMath tex="m = 25" />, that means 1 evaluation instead of over 33 million.
           The sumcheck protocol is the engine that powers WHIR's constraint reduction,
-          and it is what allows LeanMultisig to batch multiple table polynomials into a single
+          and it is what allows leanMultisig to batch multiple table polynomials into a single
           check (Section 3.7: "simple stacking of multilinear polynomials").
         </p>
       </div>

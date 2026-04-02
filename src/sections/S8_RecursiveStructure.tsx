@@ -45,10 +45,10 @@ export function S8_RecursiveStructure() {
         After all iterations, the polynomial is so small it can be checked directly.
       </p>
       <p className="mt-3">
-        In LeanMultisig, the committed polynomial has <InlineMath tex="m \approx 25" /> variables
+        In leanMultisig, the committed polynomial has <InlineMath tex="m \approx 25" /> variables
         (up to 2<sup>25</sup> rows {'\u00d7'} 20 columns stacked together) and the folding
         parameter can vary per iteration. This recursive structure is also critical for
-        LeanMultisig's aggregation tree: each node produces a proof, and the parent node must
+        leanMultisig's aggregation tree: each node produces a proof, and the parent node must
         verify it inside its own circuit. The faster WHIR's verifier, the cheaper each
         level of recursion.
       </p>
@@ -61,7 +61,7 @@ export function S8_RecursiveStructure() {
       <p className="mb-4">
         Adjust the folding parameter <InlineMath tex="k" /> to see how it affects the
         number of iterations. Starting with <InlineMath tex="m = {8}" /> variables
-        (domain size <InlineMath tex="2^8 = 256" />) for visual clarity — in LeanMultisig,{' '}
+        (domain size <InlineMath tex="2^8 = 256" />) for visual clarity — in leanMultisig,{' '}
         <InlineMath tex="m \approx 25" /> with a domain of up to 2<sup>30</sup> committed
         field elements at rate 1/2.
       </p>

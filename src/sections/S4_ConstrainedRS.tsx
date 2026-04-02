@@ -38,13 +38,13 @@ export function S4_ConstrainedRS() {
       </h3>
       <p>
         Standard Reed-Solomon codes only check one thing: "is this close to a low-degree
-        polynomial?" But LeanMultisig also needs to verify that the execution trace satisfies AIR
+        polynomial?" But leanMultisig also needs to verify that the execution trace satisfies AIR
         transition constraints — for example, when the instruction is ADD, the
         constraint <InlineMath tex="\nu_B - (\nu_A + \nu_C) = 0" /> must hold.
         FRI-based systems handle these as <em>separate steps</em>: FRI does proximity testing,
         and a different mechanism checks the constraints. <strong>Constrained Reed-Solomon
         (CRS)</strong> codes bundle both into a single test — and WHIR is an IOP of proximity
-        for CRS codes, which is why LeanMultisig uses it: proximity testing and constraint
+        for CRS codes, which is why leanMultisig uses it: proximity testing and constraint
         satisfaction are verified together in one protocol.
       </p>
 
@@ -89,7 +89,7 @@ export function S4_ConstrainedRS() {
         Why Add a Constraint?
       </h3>
       <p>
-        In LeanMultisig, the execution table has columns that must satisfy transition constraints
+        In leanMultisig, the execution table has columns that must satisfy transition constraints
         between consecutive rows. For example, if the current instruction is ADD, then the
         output value must equal the sum of the two input values. In CRS terms, these AIR
         constraints are encoded as a weighted sum: <InlineMath tex="\sum \hat{w}(\hat{f}(b), b) = \sigma" />{' '}
@@ -115,7 +115,7 @@ export function S4_ConstrainedRS() {
         Interactive Example
       </h3>
       <p className="mb-4">
-        In LeanMultisig, the CRS constraint encodes things like "every ADD instruction correctly
+        In leanMultisig, the CRS constraint encodes things like "every ADD instruction correctly
         computes its result" or "every memory access is consistent." The interactive demo
         below shows the same idea at a smaller scale: a 2-variable multilinear polynomial
         on <InlineMath tex="\{0,1\}^2" /> with the identity weight function{' '}

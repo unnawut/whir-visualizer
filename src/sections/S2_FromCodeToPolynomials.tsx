@@ -16,7 +16,7 @@ const PROGRAM_CODE = `function checked_mul_add(x, y):
   assert z < 1000         // range-check z
   return z`;
 
-// Execution trace rows using LeanMultisig's execution table columns
+// Execution trace rows using leanMultisig's execution table columns
 // Example: x = 3, y = 7 → z = 3*7 + 100 = 121
 const TRACE_ROWS = [
   { step: 0, pc: 0, fp: 100, addr_a: 100, val_a: 3,   addr_b: 0, val_b: 0,   addr_c: 0,   val_c: 0,   instr: 'DEREF',  note: 'Load x = 3 from memory at fp+0. Range-check witness: x is "small".' },
@@ -74,7 +74,7 @@ export function S2_FromCodeToPolynomials() {
       id="code-to-polynomials"
       number={2}
       title="From Code to Polynomials"
-      subtitle="How LeanMultisig turns a program's execution into polynomial equations that WHIR can prove."
+      subtitle="How leanMultisig turns a program's execution into polynomial equations that WHIR can prove."
     >
       <h3 id="arithmetization" className="font-heading text-xl font-semibold text-text mb-3">
         Arithmetization
@@ -92,10 +92,10 @@ export function S2_FromCodeToPolynomials() {
         Step 1: Run the Program, Record Everything
       </h3>
       <p>
-        Consider a LeanMultisig function (based on Example 2.1 from the LeanMultisig paper) that asserts{' '}
+        Consider a leanMultisig function (based on Example 2.1 from the leanMultisig paper) that asserts{' '}
         <InlineMath tex="x < 10" />, computes <InlineMath tex="z = x \cdot y + 100" />,
         and asserts <InlineMath tex="z < 1000" />.
-        When we run it, LeanMultisig records the machine's state at every cycle in an{' '}
+        When we run it, leanMultisig records the machine's state at every cycle in an{' '}
         <strong>execution trace</strong>. The leanISA has just four core instructions -- DEREF, ADD,
         MUL, and JUMP -- plus precompiles for POSEIDON2 and extension field operations:
       </p>
@@ -172,7 +172,7 @@ export function S2_FromCodeToPolynomials() {
 
       <p className="text-sm text-text-muted italic">
         Hover over any row to see what happens at that cycle. This table shows a simplified
-        subset of LeanMultisig's 20 committed columns per cycle.
+        subset of leanMultisig's 20 committed columns per cycle.
       </p>
 
       {/* Step 2: Columns become polynomials */}
@@ -180,7 +180,7 @@ export function S2_FromCodeToPolynomials() {
         Step 2: Columns Become Polynomials
       </h3>
       <p>
-        Each column of the trace is a sequence of field values. In LeanMultisig, each of the{' '}
+        Each column of the trace is a sequence of field values. In leanMultisig, each of the{' '}
         <strong>20 committed columns</strong> becomes a <strong>multilinear polynomial</strong>.
         With up to <InlineMath tex="2^{25}" /> rows, each polynomial has 25 variables.
         These column polynomials are then "stacked" into a single large polynomial committed
@@ -289,7 +289,7 @@ export function S2_FromCodeToPolynomials() {
       </div>
 
       <p>
-        The key insight is this: checking "did this LeanMultisig program execute correctly?" reduces to checking
+        The key insight is this: checking "did this leanMultisig program execute correctly?" reduces to checking
         "do these polynomials satisfy certain algebraic relationships?"
       </p>
 
@@ -403,7 +403,7 @@ export function S2_FromCodeToPolynomials() {
         Try it yourself: adjust the coefficients below to define a degree-2 polynomial{' '}
         <InlineMath tex="f(x) = a_0 + a_1 x + a_2 x^2" /> in{' '}
         <InlineMath tex="\mathbb{F}_{17}" /> and see its evaluations over an 8-point domain.
-        In LeanMultisig, the same idea applies to polynomials with millions of evaluations over the
+        In leanMultisig, the same idea applies to polynomials with millions of evaluations over the
         KoalaBear field — here we keep it small so you can see every number.
       </p>
 
@@ -468,7 +468,7 @@ export function S2_FromCodeToPolynomials() {
           Why This Matters for WHIR
         </h4>
         <p className="text-sm text-text-muted mb-3">
-          This is exactly how LeanMultisig works end to end: signature verification programs are executed
+          This is exactly how leanMultisig works end to end: signature verification programs are executed
           on the leanISA, producing an execution trace with up to{' '}
           <InlineMath tex="2^{25}" /> rows and 20 columns. Each column becomes a multilinear
           polynomial, and the polynomials are stacked and committed via WHIR. The verifier's job

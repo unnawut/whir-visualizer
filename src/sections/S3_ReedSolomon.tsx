@@ -200,7 +200,7 @@ function CheatingDemo() {
             {numCorrupted} of {N_DOTS} evaluations tampered ({Math.round(numCorrupted / N_DOTS * 100)}%)
             differ from the original — {sampleCount} random sample{sampleCount > 1 ? 's' : ''}{' '}
             {caughtCheating ? 'easily caught the cheater.' : 'got lucky — try re-rolling!'}{' '}
-            In LeanMultisig with 2<sup>26</sup> points and ~100 samples, evasion is virtually impossible.
+            In leanMultisig with 2<sup>26</sup> points and ~100 samples, evasion is virtually impossible.
           </p>
           <div className="bg-sienna/5 border border-sienna/20 rounded-lg px-4 py-3 text-xs text-text-muted">
             <strong className="text-sienna">Why is 9 the minimum?</strong>
@@ -318,7 +318,7 @@ function CostComparison({ traceRows }: { traceRows: number }) {
           <strong className="text-red">Without RS:</strong> the verifier has no redundancy to exploit.
           To confirm the prover's trace is correct, it must re-compute or check every single
           evaluation — all 2<sup>{traceRows}</sup> of them. This is essentially re-executing
-          the entire LeanMultisig computation.
+          the entire leanMultisig computation.
         </p>
         <p>
           <strong className="text-green">With RS + WHIR:</strong> the RS encoding adds
@@ -329,7 +329,7 @@ function CostComparison({ traceRows }: { traceRows: number }) {
           The verifier reads a tiny fraction of the data and is still overwhelmingly confident.
         </p>
         <p>
-          In LeanMultisig, this means the on-chain verifier can confirm that a batch of leanSig
+          In leanMultisig, this means the on-chain verifier can confirm that a batch of leanSig
           signature verifications was performed correctly by reading ~{whirQueries} field
           elements instead of re-running all 2<sup>{traceRows}</sup> execution steps.
         </p>
@@ -429,7 +429,7 @@ export function S3_ReedSolomon() {
         Reed-Solomon codes are the foundation of proximity testing: instead of checking
         that a function is <em>exactly</em> a low-degree polynomial, protocols like WHIR check
         that it is <em>close</em> to one. This relaxation is what makes sublinear verification
-        possible — and it is exactly what allows LeanMultisig's verifier to confirm the correctness
+        possible — and it is exactly what allows leanMultisig's verifier to confirm the correctness
         of signature aggregation without re-executing the entire computation.
       </p>
     </Section>

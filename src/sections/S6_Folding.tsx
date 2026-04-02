@@ -96,8 +96,8 @@ export function S6_Folding() {
       <p>
         <strong>Folding</strong> is the operation that makes WHIR recursive — each fold
         shrinks the domain by a factor of <InlineMath tex="2^k" />, where{' '}
-        <InlineMath tex="k" /> is the folding parameter. In LeanMultisig, the initial domain
-        might span <InlineMath tex="2^{26}" /> points. The LeanMultisig paper specifies an
+        <InlineMath tex="k" /> is the folding parameter. In leanMultisig, the initial domain
+        might span <InlineMath tex="2^{26}" /> points. The leanMultisig paper specifies an
         "initial folding of 7," meaning the first fold step reduces the domain by{' '}
         <InlineMath tex="2^7 = 128\times" />. The small 2-addicity of the KoalaBear field
         (24) is handled through WHIR's interleaved Reed-Solomon approach, which allows
@@ -136,7 +136,7 @@ export function S6_Folding() {
         Interactive Folding
       </h3>
       <p className="mb-2">
-        In LeanMultisig, folding starts from a domain of millions of points and progressively
+        In leanMultisig, folding starts from a domain of millions of points and progressively
         shrinks it. Here we demonstrate the same operation on 8 points in{' '}
         <InlineMath tex="\mathbb{F}_{17}" />, starting with{' '}
         <InlineMath tex="f(x) = 2 + 5x + 3x^2 + x^3" />. Adjust{' '}
@@ -305,13 +305,13 @@ export function S6_Folding() {
 
       <p className="mt-6 text-sm text-text-muted">
         Each fold halves the domain size. Starting from size 8, one fold gives size 4, then
-        size 2. At size 2, the polynomial is just a constant — the base case. In LeanMultisig,
+        size 2. At size 2, the polynomial is just a constant — the base case. In leanMultisig,
         the folding parameter <InlineMath tex="k" /> can be larger than 1, reducing the
         domain by <InlineMath tex="2^k" /> per iteration rather than just halving it. With
         an initial folding of 7 and subsequent folds, a domain of{' '}
         <InlineMath tex="2^{26}" /> points shrinks to a trivially small base case in just
         a few iterations. This aggressive folding is what makes WHIR practical for
-        LeanMultisig's large execution traces.
+        leanMultisig's large execution traces.
       </p>
     </Section>
   );
