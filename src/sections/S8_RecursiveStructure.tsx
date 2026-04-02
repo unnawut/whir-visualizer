@@ -45,10 +45,10 @@ export function S8_RecursiveStructure() {
         After all iterations, the polynomial is so small it can be checked directly.
       </p>
       <p className="mt-3">
-        In leanVM, the committed polynomial has <InlineMath tex="m \approx 25" /> variables
+        In LeanMultisig, the committed polynomial has <InlineMath tex="m \approx 25" /> variables
         (up to 2<sup>25</sup> rows {'\u00d7'} 20 columns stacked together) and the folding
         parameter can vary per iteration. This recursive structure is also critical for
-        leanVM's aggregation tree: each node produces a proof, and the parent node must
+        LeanMultisig's aggregation tree: each node produces a proof, and the parent node must
         verify it inside its own circuit. The faster WHIR's verifier, the cheaper each
         level of recursion.
       </p>
@@ -61,7 +61,7 @@ export function S8_RecursiveStructure() {
       <p className="mb-4">
         Adjust the folding parameter <InlineMath tex="k" /> to see how it affects the
         number of iterations. Starting with <InlineMath tex="m = {8}" /> variables
-        (domain size <InlineMath tex="2^8 = 256" />) for visual clarity — in leanVM,{' '}
+        (domain size <InlineMath tex="2^8 = 256" />) for visual clarity — in LeanMultisig,{' '}
         <InlineMath tex="m \approx 25" /> with a domain of up to 2<sup>30</sup> committed
         field elements at rate 1/2.
       </p>
@@ -183,7 +183,7 @@ export function S8_RecursiveStructure() {
             <li>Fewer total iterations to reach the base case</li>
             <li>More sumcheck rounds per iteration (higher cost each time)</li>
             <li>Fewer Merkle tree openings = smaller proofs</li>
-            <li>leanVM uses initial folding of 7 to quickly reduce the large 2<sup>26</sup> domain</li>
+            <li>LeanMultisig uses initial folding of 7 to quickly reduce the large 2<sup>26</sup> domain</li>
             <li>Better when hash operations are expensive (e.g., on-chain Ethereum verification)</li>
           </ul>
         </div>
@@ -202,7 +202,7 @@ export function S8_RecursiveStructure() {
 
       <p className="text-sm text-text-muted">
         In practice, <InlineMath tex="k" /> is chosen to balance these costs for the target
-        deployment environment. leanVM uses a large initial folding parameter (k=7) for the
+        deployment environment. LeanMultisig uses a large initial folding parameter (k=7) for the
         first iteration to quickly cut the domain from 2<sup>26</sup> down to 2<sup>19</sup>,
         then may use smaller k values for subsequent iterations. The tradeoff directly affects
         proof size and verification time on Ethereum — larger k means fewer Merkle openings

@@ -79,7 +79,7 @@ export function S9_Performance() {
         Overview
       </h3>
       <p>
-        leanVM chose WHIR specifically because of its verification speed. For recursive
+        LeanMultisig chose WHIR specifically because of its verification speed. For recursive
         aggregation, the WHIR verifier runs <em>inside</em> the next proof — so every
         microsecond of verification time multiplies across recursion levels. WHIR
         achieves the <strong>fastest verification time</strong> among comparable proximity
@@ -121,7 +121,7 @@ export function S9_Performance() {
         Benchmark Comparison
       </h3>
       <p className="mb-4">
-        These benchmarks show why leanVM uses WHIR rather than FRI or BaseFold.
+        These benchmarks show why LeanMultisig uses WHIR rather than FRI or BaseFold.
         Measured for degree <InlineMath tex="2^{22}" /> polynomials at rate{' '}
         <InlineMath tex="\rho = 1/2" />. Data from the WHIR paper (Section 8).
       </p>
@@ -261,7 +261,7 @@ export function S9_Performance() {
           <p className="text-sm text-text-muted">
             WHIR verification takes approximately <strong>400{'\u00b5'}s</strong> at 100-bit
             security — roughly 4x faster than FRI and 2x faster than STIR. This enables
-            efficient recursive aggregation in leanVM: each level of the aggregation tree
+            efficient recursive aggregation in LeanMultisig: each level of the aggregation tree
             runs the verifier inside the next proof, so faster verification directly shrinks
             the recursive circuit.
           </p>
@@ -272,7 +272,7 @@ export function S9_Performance() {
           </div>
           <p className="text-sm text-text-muted">
             Proof sizes are comparable to STIR (76 KiB at 100-bit security) and
-            significantly smaller than FRI (149 KiB) and BaseFold (564 KiB). For leanVM,
+            significantly smaller than FRI (149 KiB) and BaseFold (564 KiB). For LeanMultisig,
             smaller proofs mean less on-chain data for Ethereum validators to process,
             reducing calldata costs in the aggregation contract.
           </p>
@@ -283,7 +283,7 @@ export function S9_Performance() {
           </div>
           <p className="text-sm text-text-muted">
             WHIR is hash-based — it requires no trusted setup ceremony and no
-            pairing-friendly curves. This gives leanVM the same trust model as its
+            pairing-friendly curves. This gives LeanMultisig the same trust model as its
             leanSig post-quantum signatures: security depends only on the collision
             resistance of the hash function, making the entire system post-quantum secure.
           </p>
@@ -293,7 +293,7 @@ export function S9_Performance() {
             Native Multilinear Support
           </div>
           <p className="text-sm text-text-muted">
-            WHIR works natively with multilinear polynomials, which allows leanVM's simple
+            WHIR works natively with multilinear polynomials, which allows LeanMultisig's simple
             stacking approach: multiple table polynomials (execution, Poseidon, extension ops)
             are concatenated into one and committed via a single WHIR instance — no overhead
             from univariate FFT commitment schemes.

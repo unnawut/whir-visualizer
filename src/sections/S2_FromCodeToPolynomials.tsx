@@ -9,14 +9,14 @@ import { evaluateAll } from '../utils/polynomial';
 import type { Poly } from '../utils/polynomial';
 import { generateDomain } from '../utils/reedsolomon';
 
-// A leanVM program (Example 2.1): assert x < 10, compute z = x*y + 100, assert z < 1000
+// A LeanMultisig program (Example 2.1): assert x < 10, compute z = x*y + 100, assert z < 1000
 const PROGRAM_CODE = `function checked_mul_add(x, y):
   assert x < 10          // range-check x
   z = x * y + 100        // compute result
   assert z < 1000         // range-check z
   return z`;
 
-// Execution trace rows using leanVM's execution table columns
+// Execution trace rows using LeanMultisig's execution table columns
 // Example: x = 3, y = 7 → z = 3*7 + 100 = 121
 const TRACE_ROWS = [
   { step: 0, pc: 0, fp: 100, addr_a: 100, val_a: 3,   addr_b: 0, val_b: 0,   addr_c: 0,   val_c: 0,   instr: 'DEREF',  note: 'Load x = 3 from memory at fp+0. Range-check witness: x is "small".' },
@@ -34,7 +34,7 @@ const CONSTRAINT_STEPS = [
   {
     title: 'The Execution Trace',
     description:
-      'leanVM runs a program step by step, recording the machine state at every cycle. Each cycle captures the program counter (pc), frame pointer (fp), three address-value pairs (A, B, C), and an instruction selector. With up to 2^25 rows and 20 committed base-field columns per cycle, the full trace forms a large matrix over the KoalaBear field.',
+      'LeanMultisig runs a program step by step, recording the machine state at every cycle. Each cycle captures the program counter (pc), frame pointer (fp), three address-value pairs (A, B, C), and an instruction selector. With up to 2^25 rows and 20 committed base-field columns per cycle, the full trace forms a large matrix over the KoalaBear field.',
   },
   {
     title: 'Transition Constraints',
@@ -49,7 +49,7 @@ const CONSTRAINT_STEPS = [
   {
     title: 'From Polynomials to Proximity Testing',
     description:
-      'leanVM produces these column polynomials from the execution of signature verification programs. The prover commits them via WHIR, which tests their proximity to valid low-degree (multilinear) polynomials. If the polynomials pass WHIR\'s proximity test and satisfy the AIR constraints, the verifier is convinced the computation was correct -- without re-executing it.',
+      'LeanMultisig produces these column polynomials from the execution of signature verification programs. The prover commits them via WHIR, which tests their proximity to valid low-degree (multilinear) polynomials. If the polynomials pass WHIR\'s proximity test and satisfy the AIR constraints, the verifier is convinced the computation was correct -- without re-executing it.',
   },
 ];
 
@@ -74,7 +74,7 @@ export function S2_FromCodeToPolynomials() {
       id="code-to-polynomials"
       number={2}
       title="From Code to Polynomials"
-      subtitle="How leanVM turns a program's execution into polynomial equations that WHIR can prove."
+      subtitle="How LeanMultisig turns a program's execution into polynomial equations that WHIR can prove."
     >
       <h3 id="arithmetization" className="font-heading text-xl font-semibold text-text mb-3">
         Arithmetization
@@ -82,7 +82,7 @@ export function S2_FromCodeToPolynomials() {
       <p>
         Before we can use polynomial proximity testing (the thing WHIR does), we need to understand
         how a <em>computation</em> becomes <em>polynomials</em> in the first place. This is the
-        "arithmetization" step. In <strong>leanVM</strong> -- a minimal zkVM designed for
+        "arithmetization" step. In <strong>LeanMultisig</strong> -- a minimal zkVM designed for
         post-quantum signature aggregation on Ethereum -- arithmetization turns the execution of
         signature verification into polynomials over the KoalaBear field{' '}
         <InlineMath tex="p = 2^{31} - 2^{24} + 1" />.
@@ -92,10 +92,10 @@ export function S2_FromCodeToPolynomials() {
         Step 1: Run the Program, Record Everything
       </h3>
       <p>
-        Consider a leanVM function (based on Example 2.1 from the leanVM paper) that asserts{' '}
+        Consider a LeanMultisig function (based on Example 2.1 from the LeanMultisig paper) that asserts{' '}
         <InlineMath tex="x < 10" />, computes <InlineMath tex="z = x \cdot y + 100" />,
         and asserts <InlineMath tex="z < 1000" />.
-        When we run it, leanVM records the machine's state at every cycle in an{' '}
+        When we run it, LeanMultisig records the machine's state at every cycle in an{' '}
         <strong>execution trace</strong>. The leanISA has just four core instructions -- DEREF, ADD,
         MUL, and JUMP -- plus precompiles for POSEIDON2 and extension field operations:
       </p>
@@ -103,7 +103,7 @@ export function S2_FromCodeToPolynomials() {
       {/* Code block */}
       <div className="bg-bg-card border border-border rounded-lg my-6 overflow-hidden">
         <div className="text-xs text-text-muted px-4 py-2 border-b border-border-light bg-border-light/30 font-mono">
-          leanVM pseudocode
+          LeanMultisig pseudocode
         </div>
         <pre className="px-4 py-3 text-sm font-mono text-text overflow-x-auto leading-relaxed">
           {PROGRAM_CODE}
@@ -172,7 +172,7 @@ export function S2_FromCodeToPolynomials() {
 
       <p className="text-sm text-text-muted italic">
         Hover over any row to see what happens at that cycle. This table shows a simplified
-        subset of leanVM's 20 committed columns per cycle.
+        subset of LeanMultisig's 20 committed columns per cycle.
       </p>
 
       {/* Step 2: Columns become polynomials */}
@@ -180,7 +180,7 @@ export function S2_FromCodeToPolynomials() {
         Step 2: Columns Become Polynomials
       </h3>
       <p>
-        Each column of the trace is a sequence of field values. In leanVM, each of the{' '}
+        Each column of the trace is a sequence of field values. In LeanMultisig, each of the{' '}
         <strong>20 committed columns</strong> becomes a <strong>multilinear polynomial</strong>.
         With up to <InlineMath tex="2^{25}" /> rows, each polynomial has 25 variables.
         These column polynomials are then "stacked" into a single large polynomial committed
@@ -267,7 +267,7 @@ export function S2_FromCodeToPolynomials() {
 
       <div className="bg-bg-card border border-border rounded-lg p-5 my-4">
         <p className="text-sm text-text-muted mb-3">
-          leanVM's core constraints for each instruction type:
+          LeanMultisig's core constraints for each instruction type:
         </p>
         <div className="space-y-3">
           <div>
@@ -289,7 +289,7 @@ export function S2_FromCodeToPolynomials() {
       </div>
 
       <p>
-        The key insight is this: checking "did this leanVM program execute correctly?" reduces to checking
+        The key insight is this: checking "did this LeanMultisig program execute correctly?" reduces to checking
         "do these polynomials satisfy certain algebraic relationships?"
       </p>
 
@@ -329,7 +329,7 @@ export function S2_FromCodeToPolynomials() {
             {step === 0 && (
               <div className="flex items-center justify-center gap-3">
                 <div className="bg-bg border border-border-light rounded p-3 text-center">
-                  <div className="text-xs text-text-muted mb-1">leanVM Program</div>
+                  <div className="text-xs text-text-muted mb-1">LeanMultisig Program</div>
                   <div className="font-mono text-sm">checked_mul_add()</div>
                 </div>
                 <div className="text-text-muted">→</div>
@@ -377,7 +377,7 @@ export function S2_FromCodeToPolynomials() {
               <div className="flex items-center justify-center gap-3">
                 <div className="bg-bg border border-border-light rounded p-3 text-center">
                   <div className="text-xs text-text-muted mb-1">Signature verification</div>
-                  <div className="font-mono text-xs">leanVM trace</div>
+                  <div className="font-mono text-xs">LeanMultisig trace</div>
                 </div>
                 <div className="text-text-muted">→</div>
                 <div className="bg-bg border border-border-light rounded p-3 text-center">
@@ -403,7 +403,7 @@ export function S2_FromCodeToPolynomials() {
         Try it yourself: adjust the coefficients below to define a degree-2 polynomial{' '}
         <InlineMath tex="f(x) = a_0 + a_1 x + a_2 x^2" /> in{' '}
         <InlineMath tex="\mathbb{F}_{17}" /> and see its evaluations over an 8-point domain.
-        In leanVM, the same idea applies to polynomials with millions of evaluations over the
+        In LeanMultisig, the same idea applies to polynomials with millions of evaluations over the
         KoalaBear field — here we keep it small so you can see every number.
       </p>
 
@@ -468,7 +468,7 @@ export function S2_FromCodeToPolynomials() {
           Why This Matters for WHIR
         </h4>
         <p className="text-sm text-text-muted mb-3">
-          This is exactly how leanVM works end to end: signature verification programs are executed
+          This is exactly how LeanMultisig works end to end: signature verification programs are executed
           on the leanISA, producing an execution trace with up to{' '}
           <InlineMath tex="2^{25}" /> rows and 20 columns. Each column becomes a multilinear
           polynomial, and the polynomials are stacked and committed via WHIR. The verifier's job

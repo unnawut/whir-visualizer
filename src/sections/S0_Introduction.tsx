@@ -6,14 +6,14 @@ export function S0_Introduction() {
     <Section
       id="introduction"
       title="About"
-      subtitle="An interactive guide to understanding the WHIR protocol — the polynomial commitment scheme inside leanVM."
+      subtitle="An interactive guide to understanding the WHIR protocol — the polynomial commitment scheme inside LeanMultisig."
     >
       <h3 id="about-this-visualizer" className="font-heading text-xl font-semibold text-text mb-3">
         About This Visualizer
       </h3>
       <p>
         This visualizer explains <strong>WHIR</strong> (Weights Help Improving Rate), the polynomial
-        commitment scheme used inside <strong>leanVM</strong> — a minimal zkVM designed to aggregate
+        commitment scheme used inside <strong>LeanMultisig</strong> — a minimal zkVM designed to aggregate
         post-quantum hash-based signatures for Ethereum.
       </p>
       <p className="mt-3">
@@ -21,12 +21,12 @@ export function S0_Introduction() {
         BLS is efficient and supports cheap aggregation, but it is vulnerable to quantum computers.
         The migration path leads to hash-based signatures like{' '}
         <a href="https://github.com/leanEthereum/leanSig" target="_blank" rel="noopener noreferrer" className="text-sienna hover:underline font-semibold">leanSig</a>,
-        which are quantum-resistant but 10-100x larger than BLS and lack native aggregation. leanVM is a
+        which are quantum-resistant but 10-100x larger than BLS and lack native aggregation. LeanMultisig is a
         minimal zkVM that aggregates thousands of these signatures into a single compact proof using
         a hash-based SNARK powered by WHIR.
       </p>
       <p className="mt-3">
-        WHIR is the component that makes leanVM's verifier fast enough for on-chain verification
+        WHIR is the component that makes LeanMultisig's verifier fast enough for on-chain verification
         and recursive proof composition. Its super-fast verification time — hundreds of microseconds
         — is what enables a tree of recursive proofs to aggregate batches of leanSig signatures
         into one final proof that Ethereum validators can check cheaply.
@@ -43,7 +43,7 @@ export function S0_Introduction() {
       <p>
         Throughout this site, interactive demos let you explore the math hands-on. To keep
         things readable, all demos operate over a small finite field rather than the large
-        fields used in leanVM's production implementation.
+        fields used in LeanMultisig's production implementation.
       </p>
 
       <div className="bg-bg-card border border-border rounded-lg p-5 my-6 space-y-4">
@@ -53,11 +53,11 @@ export function S0_Introduction() {
           </div>
           <p className="text-sm text-text-muted">
             The demos use <InlineMath tex="\mathbb{F}_{17}" /> (arithmetic modulo the
-            prime <InlineMath tex="p = 17" />) for readability. In leanVM, the field
+            prime <InlineMath tex="p = 17" />) for readability. In LeanMultisig, the field
             is the <strong>KoalaBear prime</strong>{' '}
             <InlineMath tex="p = 2^{31} - 2^{24} + 1" />, which fits in a single{' '}
             <code>u32</code> and enables an efficient Poseidon2 S-box via the cubing
-            map <InlineMath tex="x \mapsto x^3" />. For 128-bit security in WHIR, leanVM works
+            map <InlineMath tex="x \mapsto x^3" />. For 128-bit security in WHIR, LeanMultisig works
             over the degree-5 extension field <InlineMath tex="\mathbb{F}_{p^5}" />.
           </p>
         </div>
@@ -72,7 +72,7 @@ export function S0_Introduction() {
             <InlineMath tex="3^{16} \equiv 1 \pmod{17}" />). This gives us subgroups of size
             16, 8, 4, and 2 — perfect for demonstrating the repeated domain halving that WHIR
             relies on. The demos typically start with a domain of size 8 and fold down to 4,
-            then 2. In leanVM, the KoalaBear field has a much larger multiplicative group,
+            then 2. In LeanMultisig, the KoalaBear field has a much larger multiplicative group,
             enabling commitment domains of up to <InlineMath tex="2^{30}" /> elements.
           </p>
         </div>
@@ -88,7 +88,7 @@ export function S0_Introduction() {
             <InlineMath tex="[2, 5, 3]" /> and evaluations are computed via Horner's method.
             Multilinear polynomials (used in the sumcheck demos) are stored as their{' '}
             <InlineMath tex="2^m" /> evaluations over the boolean hypercube{' '}
-            <InlineMath tex="\{0,1\}^m" />. In leanVM, execution traces have up
+            <InlineMath tex="\{0,1\}^m" />. In LeanMultisig, execution traces have up
             to <InlineMath tex="2^{25}" /> rows with 20 committed columns per cycle — these
             are encoded as multilinear polynomials and committed via WHIR.
           </p>
@@ -118,7 +118,7 @@ export function S0_Introduction() {
           This visualizer is based on the protocol described in that paper.
         </p>
         <p className="text-sm text-text-muted">
-          <strong>leanVM</strong> is described in{' '}
+          <strong>LeanMultisig</strong> is described in{' '}
           <em>"Minimal zkVM for Lean Ethereum"</em> (draft 0.6.0), which specifies how WHIR
           is used as the polynomial commitment scheme inside a minimal zkVM tailored for
           post-quantum signature aggregation on Ethereum.

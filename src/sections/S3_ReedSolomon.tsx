@@ -200,7 +200,7 @@ function CheatingDemo() {
             {numCorrupted} of {N_DOTS} evaluations tampered ({Math.round(numCorrupted / N_DOTS * 100)}%)
             differ from the original — {sampleCount} random sample{sampleCount > 1 ? 's' : ''}{' '}
             {caughtCheating ? 'easily caught the cheater.' : 'got lucky — try re-rolling!'}{' '}
-            In leanVM with 2<sup>26</sup> points and ~100 samples, evasion is virtually impossible.
+            In LeanMultisig with 2<sup>26</sup> points and ~100 samples, evasion is virtually impossible.
           </p>
           <div className="bg-sienna/5 border border-sienna/20 rounded-lg px-4 py-3 text-xs text-text-muted">
             <strong className="text-sienna">Why is 9 the minimum?</strong>
@@ -318,7 +318,7 @@ function CostComparison({ traceRows }: { traceRows: number }) {
           <strong className="text-red">Without RS:</strong> the verifier has no redundancy to exploit.
           To confirm the prover's trace is correct, it must re-compute or check every single
           evaluation — all 2<sup>{traceRows}</sup> of them. This is essentially re-executing
-          the entire leanVM computation.
+          the entire LeanMultisig computation.
         </p>
         <p>
           <strong className="text-green">With RS + WHIR:</strong> the RS encoding adds
@@ -329,7 +329,7 @@ function CostComparison({ traceRows }: { traceRows: number }) {
           The verifier reads a tiny fraction of the data and is still overwhelmingly confident.
         </p>
         <p>
-          In leanVM, this means the on-chain verifier can confirm that a batch of leanSig
+          In LeanMultisig, this means the on-chain verifier can confirm that a batch of leanSig
           signature verifications was performed correctly by reading ~{whirQueries} field
           elements instead of re-running all 2<sup>{traceRows}</sup> execution steps.
         </p>
@@ -395,13 +395,13 @@ export function S3_ReedSolomon() {
       </h3>
       <p>
         In traditional applications (QR codes, DVDs), Reed-Solomon codes <em>correct</em> errors —
-        the receiver recovers the original data. leanVM and WHIR only need the weaker property
+        the receiver recovers the original data. LeanMultisig and WHIR only need the weaker property
         of <em>detection</em>: the verifier doesn't fix anything, it just checks whether the
         prover's data is close to a valid polynomial and rejects if it isn't. Detection is cheaper
         than correction, which is part of why WHIR can get away with reading so few points.
       </p>
       <p className="mt-3">
-        In <strong>leanVM</strong>, the prover evaluates each column polynomial over a domain much
+        In <strong>LeanMultisig</strong>, the prover evaluates each column polynomial over a domain much
         larger than the execution trace. With a rate of{' '}
         <InlineMath tex="\rho = 1/2" />, a trace of <InlineMath tex="2^{25}" /> rows means
         evaluating over <InlineMath tex="2^{26}" /> domain points. If the prover tries to cheat
@@ -429,7 +429,7 @@ export function S3_ReedSolomon() {
         Reed-Solomon codes are the foundation of proximity testing: instead of checking
         that a function is <em>exactly</em> a low-degree polynomial, protocols like WHIR check
         that it is <em>close</em> to one. This relaxation is what makes sublinear verification
-        possible — and it is exactly what allows leanVM's verifier to confirm the correctness
+        possible — and it is exactly what allows LeanMultisig's verifier to confirm the correctness
         of signature aggregation without re-executing the entire computation.
       </p>
     </Section>
