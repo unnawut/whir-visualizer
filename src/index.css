@@ -13,8 +13,8 @@
   --color-border: #e0dcd4;
   --color-border-light: #ebe7df;
 
-  --font-heading: 'Crimson Pro', 'Georgia', serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Lora', 'Georgia', serif;
+  --font-body: 'Lora', 'Georgia', serif;
   --font-mono: ui-monospace, 'Consolas', monospace;
 }
 
@@ -25,7 +25,7 @@ html {
 body {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.7;
   color: var(--color-text);
   background: var(--color-bg);
