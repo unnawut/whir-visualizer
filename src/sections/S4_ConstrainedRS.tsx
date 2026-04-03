@@ -6,25 +6,33 @@ import { Slider } from '../components/ui/Slider';
 import { mod } from '../utils/field';
 
 export function S4_ConstrainedRS() {
-  // 4 values for f on {0,1}^2: f(0,0), f(0,1), f(1,0), f(1,1)
-  const [f00, setF00] = useState(3);
-  const [f01, setF01] = useState(5);
-  const [f10, setF10] = useState(2);
-  const [f11, setF11] = useState(7);
-  const [sigma, setSigma] = useState(0);
+  // Inputs for the ADD chain
+  const [a, setA] = useState(3);
+  const [b, setB] = useState(5);
+  const [c, setC] = useState(4);
 
-  const computedSum = useMemo(() => {
-    return mod(f00 + f01 + f10 + f11);
-  }, [f00, f01, f10, f11]);
+  // Correct trace values
+  const step1 = mod(a + b);      // ADD(a, b)
+  const step2 = mod(step1 + c);  // ADD(step1, c)
 
-  const isSatisfied = computedSum === mod(sigma);
+  // Row 1 output — editable, defaults to correct value
+  const [overrideStep2, setOverrideStep2] = useState<number | null>(null);
 
-  const vertices: { label: string; x: number; y: number; value: number }[] = [
-    { label: '(0,0)', x: 60, y: 120, value: f00 },
-    { label: '(0,1)', x: 200, y: 120, value: f01 },
-    { label: '(1,0)', x: 60, y: 30, value: f10 },
-    { label: '(1,1)', x: 200, y: 30, value: f11 },
-  ];
+  const traceStep1 = step1;
+  const traceStep2 = overrideStep2 !== null ? mod(overrideStep2) : step2;
+
+  // CRS constraint: for each ADD row, output - input1 - input2 = 0
+  // Row 0: step1 - a - b = 0  →  weight: w(0) = step1 - a - b
+  // Row 1: step2 - step1 - c = 0  →  weight: w(1) = step2 - step1 - c
+  // Total constraint: (step1 - a - b) + (step2 - step1 - c) = 0  (mod 17)
+  const error1 = mod(traceStep1 - a - b);
+  const error2 = mod(traceStep2 - traceStep1 - c);
+  const totalError = mod(error1 + error2);
+  const constraintSatisfied = totalError === 0;
+
+  // Trace as polynomial on {0,1}^2
+  // f(0,0) = a, f(0,1) = b, f(1,0) = step1, f(1,1) = c
+  // The trace encodes: row 0 inputs at (0,0) and (0,1), output at (1,0); row 1 uses (1,0) and (1,1) → step2
 
   return (
     <Section
@@ -41,12 +49,39 @@ export function S4_ConstrainedRS() {
         polynomial?" But leanMultisig also needs to verify that the execution trace satisfies AIR
         transition constraints — for example, when the instruction is ADD, the
         constraint <InlineMath tex="\nu_B - (\nu_A + \nu_C) = 0" /> must hold.
-        FRI-based systems handle these as <em>separate steps</em>: FRI does proximity testing,
-        and a different mechanism checks the constraints. <strong>Constrained Reed-Solomon
-        (CRS)</strong> codes bundle both into a single test — and WHIR is an IOP of proximity
-        for CRS codes, which is why leanMultisig uses it: proximity testing and constraint
-        satisfaction are verified together in one protocol.
+        <strong>Constrained Reed-Solomon (CRS)</strong> codes bundle both into a single
+        test — and WHIR is an IOP of proximity for CRS codes, which is why leanMultisig uses
+        it: proximity testing and constraint satisfaction are verified together in one protocol.
       </p>
+
+      <div className="bg-bg-card border border-border rounded-lg p-5 my-6">
+        <h4 className="font-heading font-semibold text-base text-text mb-3">
+          How do FRI/STIR handle AIR constraints without CRS?
+        </h4>
+        <p className="text-sm text-text-muted mb-3">
+          FRI and STIR are proximity tests for <em>standard</em> Reed-Solomon codes — they only
+          check "is this close to a low-degree polynomial?" They have no built-in notion of
+          constraints. So systems that use FRI (like StarkNet or Plonky3) handle AIR constraints
+          as a <strong>separate step</strong>:
+        </p>
+        <ol className="list-decimal list-inside text-sm text-text-muted space-y-2 mb-3">
+          <li>The prover commits to the execution trace polynomials</li>
+          <li>The verifier sends random challenges</li>
+          <li>The prover constructs a <strong>composition polynomial</strong> that combines all
+            AIR constraints — if the constraints are satisfied, this polynomial is also low-degree</li>
+          <li>FRI/STIR then tests proximity of this composition polynomial</li>
+        </ol>
+        <p className="text-sm text-text-muted mb-3">
+          This works, but it requires an extra commitment and an extra round of proximity testing
+          for the composition polynomial.
+        </p>
+        <p className="text-sm text-text-muted">
+          <strong>WHIR's advantage:</strong> CRS codes encode the constraint directly into the
+          code definition. WHIR tests proximity and checks the constraint <em>simultaneously</em> in
+          a single protocol — no separate composition polynomial, no extra commitment. This is
+          one reason WHIR's verifier is faster.
+        </p>
+      </div>
 
       <MathBlock tex="\text{CRS}[L, d, \hat{w}, \sigma] = \left\{ \hat{f} \in \text{RS}[L, d] \ \middle|\ \sum_{b \in \{0,1\}^m} \hat{w}(\hat{f}(b), b) = \sigma \right\}" />
 
@@ -112,159 +147,328 @@ export function S4_ConstrainedRS() {
       </p>
 
       <h3 id="crs-interactive-example" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
-        Interactive Example
+        Interactive Example: From ADD Chain to CRS
       </h3>
       <p className="mb-4">
-        In leanMultisig, the CRS constraint encodes things like "every ADD instruction correctly
-        computes its result" or "every memory access is consistent." The interactive demo
-        below shows the same idea at a smaller scale: a 2-variable multilinear polynomial
-        on <InlineMath tex="\{0,1\}^2" /> with the identity weight function{' '}
-        <InlineMath tex="\hat{w} = 1" />. The constraint becomes: the sum of all four
-        evaluations must equal <InlineMath tex="\sigma" />.
+        Let's build a CRS constraint from scratch using a concrete computation. We'll start with
+        a simple chain of ADD operations, record the execution trace, then see how
+        the CRS constraint catches a dishonest prover who tampers with the trace.
+        All arithmetic is mod 17.
       </p>
 
-      <div className="bg-bg-card border border-border rounded-lg p-5 space-y-5">
-        {/* Sliders */}
-        <div className="grid grid-cols-2 gap-4">
-          <Slider
-            label="f(0,0)"
-            value={f00}
-            min={0}
-            max={16}
-            onChange={setF00}
-          />
-          <Slider
-            label="f(0,1)"
-            value={f01}
-            min={0}
-            max={16}
-            onChange={setF01}
-          />
-          <Slider
-            label="f(1,0)"
-            value={f10}
-            min={0}
-            max={16}
-            onChange={setF10}
-          />
-          <Slider
-            label="f(1,1)"
-            value={f11}
-            min={0}
-            max={16}
-            onChange={setF11}
-          />
+      <div className="bg-bg-card border border-border rounded-lg p-5 space-y-6">
+
+        {/* Goal */}
+        <div>
+          <h4 className="font-heading font-semibold text-base text-text mb-3">
+            Goal
+          </h4>
+          <p className="text-sm text-text-muted mb-3">
+            Three referees — Alice, Bob, and Charlie — each give a score to a
+            performance. A program computes the total score by adding them up. We want
+            anyone to be able to validate that the total is correct — without having to
+            collect all the individual scores and re-add them.
+          </p>
+          <p className="text-sm text-text-muted mb-3">
+            With plain Reed-Solomon
+            codes, we can check that the prover's trace is a valid low-degree
+            polynomial — but that only tells us the data is <em>structured</em>, not
+            that the additions were actually done correctly. The prover could submit a
+            perfectly valid polynomial that encodes completely wrong
+            answers.
+          </p>
+          <p className="text-sm text-text-muted mb-3">
+            A <strong>CRS constraint</strong> closes this gap: it checks both
+            that the trace is a low-degree polynomial <em>and</em> that every addition
+            was done honestly — in a single test.
+          </p>
         </div>
 
-        <div className="border-t border-border pt-4">
-          <Slider
-            label={'\u03c3 (target sum)'}
-            value={sigma}
-            min={0}
-            max={16}
-            onChange={setSigma}
-          />
+        {/* Step 1: The computation */}
+        <div className="border-t border-border pt-5">
+          <h4 className="font-heading font-semibold text-base text-text mb-3">
+            Step 1: The computation
+          </h4>
+          <p className="text-sm text-text-muted mb-3">
+            Choose each referee's score (0 to 5). The program performs two ADD operations:
+          </p>
+          {/* Visual ADD chain */}
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-4 mb-2 max-w-[320px] mx-auto">
+              <Slider label="Alice (a)" value={a} min={0} max={5} onChange={setA} />
+              <Slider label="Bob (b)" value={b} min={0} max={5} onChange={setB} />
+            </div>
+            <div className="flex items-center justify-center gap-2 text-sm font-mono">
+              <span className="text-xs text-text-muted mr-1">ADD 1:</span>
+              <span className="bg-navy/10 text-navy rounded px-2 py-1 font-bold">{a}</span>
+              <span className="text-text-muted">+</span>
+              <span className="bg-navy/10 text-navy rounded px-2 py-1 font-bold">{b}</span>
+              <span className="text-text-muted">=</span>
+              <span className="rounded px-2 py-1 font-bold" style={{ background: 'rgba(99,102,241,0.1)', color: '#4f46e5' }}>{step1}</span>
+            </div>
+            <div className="flex items-center justify-center text-text-muted text-xs">&darr;</div>
+            <div className="max-w-[150px] mx-auto mb-2">
+              <Slider label="Charlie (c)" value={c} min={0} max={5} onChange={setC} />
+            </div>
+            <div className="flex items-center justify-center gap-2 text-sm font-mono">
+              <span className="text-xs text-text-muted mr-1">ADD 2:</span>
+              <span className="rounded px-2 py-1 font-bold" style={{ background: 'rgba(99,102,241,0.1)', color: '#4f46e5' }}>{step1}</span>
+              <span className="text-text-muted">+</span>
+              <span className="bg-navy/10 text-navy rounded px-2 py-1 font-bold">{c}</span>
+              <span className="text-text-muted">=</span>
+              <span className="bg-green/10 text-green rounded px-2 py-1 font-bold">{step2}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Hypercube visualization */}
-        <div className="flex justify-center">
-          <svg viewBox="0 0 260 160" className="w-full max-w-[300px]">
-            {/* Edges of the hypercube */}
-            <line x1={60} y1={120} x2={200} y2={120} stroke="#e0dcd4" strokeWidth={1.5} />
-            <line x1={60} y1={30} x2={200} y2={30} stroke="#e0dcd4" strokeWidth={1.5} />
-            <line x1={60} y1={120} x2={60} y2={30} stroke="#e0dcd4" strokeWidth={1.5} />
-            <line x1={200} y1={120} x2={200} y2={30} stroke="#e0dcd4" strokeWidth={1.5} />
+        {/* Step 2: The execution trace */}
+        <div className="border-t border-border pt-5">
+          <h4 className="font-heading font-semibold text-base text-text mb-3">
+            Step 2: The execution trace
+          </h4>
+          <p className="text-sm text-text-muted mb-3">
+            The prover records each ADD operation in a trace table. Each row has two inputs
+            and one output:
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Row</th>
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Opcode</th>
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Input 1</th>
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Input 2</th>
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Output</th>
+                </tr>
+              </thead>
+              <tbody className="font-mono">
+                <tr className="border-b border-border-light">
+                  <td className="py-2 px-3 text-text-muted">0</td>
+                  <td className="py-2 px-3 text-text-muted">ADD 1</td>
+                  <td className="py-2 px-3 text-navy font-bold">{a}</td>
+                  <td className="py-2 px-3 text-navy font-bold">{b}</td>
+                  <td className="py-2 px-3 font-bold" style={{ color: '#4f46e5' }}>
+                    {traceStep1}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 px-3 text-text-muted">1</td>
+                  <td className="py-2 px-3 text-text-muted">ADD 2</td>
+                  <td className="py-2 px-3 font-bold" style={{ color: '#4f46e5' }}>{traceStep1}</td>
+                  <td className="py-2 px-3 text-navy font-bold">{c}</td>
+                  <td className={`py-2 px-3 font-bold ${error2 !== 0 ? 'text-red' : 'text-green'}`}>
+                    {traceStep2}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-            {/* Vertices */}
-            {vertices.map((v, i) => (
-              <g key={i}>
-                <motion.circle
-                  cx={v.x}
-                  cy={v.y}
-                  r={22}
-                  fill="#fefdfb"
-                  stroke="#8b4513"
-                  strokeWidth={2}
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 0.3, delay: i * 0.05 }}
-                />
-                <text
-                  x={v.x}
-                  y={v.y - 3}
-                  textAnchor="middle"
-                  className="text-[12px] font-mono font-bold"
-                  fill="#8b4513"
-                >
-                  {v.value}
-                </text>
-                <text
-                  x={v.x}
-                  y={v.y + 12}
-                  textAnchor="middle"
-                  className="text-[8px]"
-                  fill="#6b6375"
-                >
-                  {v.label}
-                </text>
-              </g>
-            ))}
-          </svg>
+          <p className="text-xs text-text-muted mt-3 italic">
+            Note: this execution trace structure is shared by all STARK-based systems — FRI,
+            STIR, and WHIR all work with the same kind of trace.
+          </p>
         </div>
 
-        {/* Step-by-step computation */}
-        <div className="bg-bg border border-border-light rounded-md p-4 space-y-2">
-          <p className="text-sm font-medium text-text">Step-by-step computation:</p>
-          <div className="font-mono text-sm text-text-muted space-y-1">
-            <p>
-              f(0,0) + f(0,1) + f(1,0) + f(1,1) mod 17
+        {/* Step 3: The constraint check */}
+        <div className="border-t border-border pt-5">
+          <h4 className="font-heading font-semibold text-base text-text mb-3">
+            Step 3: The constraint check
+          </h4>
+          <p className="text-sm text-text-muted mb-3">
+            How do we verify the trace without re-running the computation? We define a
+            constraint for the ADD opcode: if the addition was done correctly, the output
+            minus the two inputs must equal zero.
+          </p>
+
+          <div className="bg-bg border border-border-light rounded-lg p-4 my-4 text-center">
+            <p className="text-xs text-text-muted mb-2 font-semibold uppercase tracking-wide">ADD constraint</p>
+            <div className="text-lg mb-2">
+              <InlineMath tex="\text{input}_1 + \text{input}_2 = \text{output}" />
+            </div>
+            <p className="text-xs text-text-muted mb-2">
+              Rearranging to check for errors:
             </p>
-            <p>
-              = {f00} + {f01} + {f10} + {f11} mod 17
+            <div className="text-lg">
+              <InlineMath tex="\text{output} - \text{input}_1 - \text{input}_2 = 0" />
+            </div>
+            <p className="text-xs text-text-muted mt-2">
+              If this equals 0, the ADD was computed correctly. Any non-zero value means the prover cheated.
             </p>
-            <p>
-              = {f00 + f01 + f10 + f11} mod 17
-            </p>
-            <p className="font-bold text-text">
-              = {computedSum}
-            </p>
+          </div>
+
+          <p className="text-sm text-text-muted mb-3">
+            Applying this constraint to each row of the trace:
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Row</th>
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Opcode</th>
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Input 1</th>
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Input 2</th>
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Output</th>
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Constraint check</th>
+                  <th className="text-left py-2 px-3 font-heading font-semibold text-text-muted text-xs">Result</th>
+                </tr>
+              </thead>
+              <tbody className="font-mono">
+                <tr className="border-b border-border-light">
+                  <td className="py-2 px-3 text-text-muted">0</td>
+                  <td className="py-2 px-3 text-text-muted">ADD 1</td>
+                  <td className="py-2 px-3 text-navy font-bold">{a}</td>
+                  <td className="py-2 px-3 text-navy font-bold">{b}</td>
+                  <td className="py-2 px-3 font-bold" style={{ color: '#4f46e5' }}>
+                    {traceStep1}
+                  </td>
+                  <td className="py-2 px-3">
+                    <span style={{ color: '#4f46e5' }}>{traceStep1}</span>{' - '}
+                    <span className="text-navy">{a}</span>{' - '}
+                    <span className="text-navy">{b}</span>{' = '}{error1}
+                  </td>
+                  <td className="py-2 px-3">
+                    <span className={error1 === 0 ? 'text-green font-bold' : 'text-red font-bold'}>
+                      {error1 === 0 ? '\u2713 valid' : '\u2717 invalid'}
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 px-3 text-text-muted">1</td>
+                  <td className="py-2 px-3 text-text-muted">ADD 2</td>
+                  <td className="py-2 px-3 font-bold" style={{ color: '#4f46e5' }}>{traceStep1}</td>
+                  <td className="py-2 px-3 text-navy font-bold">{c}</td>
+                  <td className={`py-2 px-3 font-bold ${error2 !== 0 ? 'text-red' : 'text-green'}`}>
+                    {traceStep2}
+                  </td>
+                  <td className="py-2 px-3">
+                    <span className={error2 !== 0 ? 'text-red' : 'text-green'}>{traceStep2}</span>{' - '}
+                    <span style={{ color: '#4f46e5' }}>{traceStep1}</span>{' - '}
+                    <span className="text-navy">{c}</span>{' = '}{error2}
+                  </td>
+                  <td className="py-2 px-3">
+                    <span className={error2 === 0 ? 'text-green font-bold' : 'text-red font-bold'}>
+                      {error2 === 0 ? '\u2713 valid' : '\u2717 invalid'}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p className="text-xs text-text-muted mt-3 italic">
+            The same idea applies to other opcodes: SUB
+            checks <InlineMath tex="\text{output} - \text{input}_1 + \text{input}_2 = 0" />,
+            MUL checks <InlineMath tex="\text{output} - \text{input}_1 \times \text{input}_2 = 0" />,
+            and so on.
+          </p>
+        </div>
+
+        {/* Step 4: The CRS constraint */}
+        <div className="border-t border-border pt-5">
+          <h4 className="font-heading font-semibold text-base text-text mb-3">
+            Step 4: The CRS constraint
+          </h4>
+          <p className="text-sm text-text-muted mb-3">
+            Instead of checking each row individually, CRS encodes <em>all</em> ADD constraints
+            as a single weighted sum. The weight
+            function <InlineMath tex="\hat{w}" /> extracts "output - input1 - input2" from each
+            row, and the target is <InlineMath tex="\sigma = 0" />:
+          </p>
+
+          <div className="bg-bg border border-border-light rounded-md p-4 font-mono text-sm">
+            {/* Per-row constraint errors */}
+            <div className="grid grid-cols-[auto_1fr_auto] gap-x-4 gap-y-2 items-center mb-3">
+              <span className="text-text-muted text-xs">Row 0</span>
+              <span>
+                <span style={{ color: '#4f46e5' }}>{traceStep1}</span>
+                {' - '}<span className="text-navy">{a}</span>
+                {' - '}<span className="text-navy">{b}</span>
+              </span>
+              <span className={`font-bold text-right ${error1 === 0 ? '' : 'text-red'}`}>= {error1}</span>
+
+              <span className="text-text-muted text-xs">Row 1</span>
+              <span>
+                <span className={error2 !== 0 ? 'text-red' : 'text-green'}>{traceStep2}</span>
+                {' - '}<span style={{ color: '#4f46e5' }}>{traceStep1}</span>
+                {' - '}<span className="text-navy">{c}</span>
+              </span>
+              <span className={`font-bold text-right ${error2 === 0 ? '' : 'text-red'}`}>= {error2}</span>
+            </div>
+
+            {/* Summation line */}
+            <div className="border-t border-border-light pt-3 flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2">
+                <span className="text-text-muted text-xs">Weighted sum</span>
+                <span className={error1 === 0 ? '' : 'text-red font-bold'}>{error1}</span>
+                {' + '}
+                <span className={error2 === 0 ? '' : 'text-red font-bold'}>{error2}</span>
+                <span className="text-text-muted">= </span>
+                <span className={`text-lg font-bold ${constraintSatisfied ? 'text-green' : 'text-red'}`}>{totalError}</span>
+              </div>
+              <span className="text-text-muted text-xs">
+                (target &sigma; = 0)
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 5: Try to cheat */}
+        <div className="border-t border-border pt-5">
+          <h4 className="font-heading font-semibold text-base text-text mb-3">
+            Step 5: Try to cheat!
+          </h4>
+          <p className="text-sm text-text-muted mb-3">
+            A dishonest prover might submit a fake output for row 1. Try changing the
+            value below — watch how the CRS constraint catches any incorrect answer:
+          </p>
+
+          <div className="max-w-[400px] mx-auto mb-4">
+            <Slider
+              label="Row 1 output"
+              value={overrideStep2 !== null ? overrideStep2 : step2}
+              min={0}
+              max={16}
+              onChange={setOverrideStep2}
+            />
           </div>
         </div>
 
         {/* Result */}
         <motion.div
           className={`flex items-center justify-center gap-3 p-4 rounded-lg border ${
-            isSatisfied
+            constraintSatisfied
               ? 'bg-green/5 border-green/30'
               : 'bg-red/5 border-red/30'
           }`}
           animate={{ scale: [1, 1.01, 1] }}
-          key={`${computedSum}-${sigma}`}
+          key={`${totalError}-${overrideStep2}`}
         >
-          <span className="text-2xl">{isSatisfied ? '\u2713' : '\u2717'}</span>
+          <span className="text-2xl">{constraintSatisfied ? '\u2713' : '\u2717'}</span>
           <div>
             <p
               className={`font-semibold ${
-                isSatisfied ? 'text-green' : 'text-red'
+                constraintSatisfied ? 'text-green' : 'text-red'
               }`}
             >
-              {isSatisfied
-                ? 'Constraint satisfied!'
-                : 'Constraint not satisfied'}
+              {constraintSatisfied
+                ? 'CRS constraint satisfied — trace is valid!'
+                : 'CRS constraint violated — cheating detected!'}
             </p>
             <p className="text-sm text-text-muted">
-              Sum = {computedSum}, target {'\u03c3'} = {mod(sigma)}
-              {!isSatisfied && ` (need ${mod(sigma)}, got ${computedSum})`}
+              Weighted sum = {totalError}, target &sigma; = 0
+              {!constraintSatisfied && ` (off by ${totalError})`}
             </p>
           </div>
         </motion.div>
       </div>
 
       <p className="mt-6 text-sm text-text-muted">
-        In the full WHIR protocol, the weight function <InlineMath tex="\hat{w}" /> is
-        typically the equality polynomial <InlineMath tex="\text{eq}(X, z)" />, and the
-        target <InlineMath tex="\sigma" /> is the value the verifier wants to check. Each
-        WHIR iteration takes a CRS proximity claim and reduces it to a smaller one using
-        sumcheck and folding.
+        This is exactly what WHIR does at scale. In leanMultisig, the trace has millions of rows
+        and the weight function encodes all AIR constraints (ADD, MUL, memory consistency, etc.)
+        simultaneously. WHIR checks that the committed polynomial is both low-degree <em>and</em> satisfies
+        the weighted sum constraint — in a single protocol, without a separate composition step.
       </p>
     </Section>
   );

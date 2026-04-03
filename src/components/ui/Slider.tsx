@@ -36,15 +36,15 @@ export function Slider({
                    [&::-webkit-slider-thumb]:appearance-none
                    [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
                    [&::-webkit-slider-thumb]:rounded-full
-                   [&::-webkit-slider-thumb]:bg-sienna
+                   [&::-webkit-slider-thumb]:bg-text
                    [&::-webkit-slider-thumb]:shadow-sm
                    [&::-webkit-slider-thumb]:cursor-pointer
                    [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4
                    [&::-moz-range-thumb]:rounded-full
-                   [&::-moz-range-thumb]:bg-sienna
+                   [&::-moz-range-thumb]:bg-text
                    [&::-moz-range-thumb]:border-0
                    [&::-moz-range-thumb]:cursor-pointer"
-        style={{ accentColor: '#8b4513' }}
+        style={{ accentColor: '#2c2c2c' }}
       />
     </div>
   );

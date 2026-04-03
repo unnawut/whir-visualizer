@@ -346,6 +346,16 @@ export function S3_ReedSolomon() {
       title="Reed-Solomon Codes"
       subtitle="Low-degree polynomials give us redundancy, and redundancy lets us detect errors."
     >
+      <p className="bg-bg-card border border-border rounded-lg p-4 mb-6 text-sm text-text-muted">
+        <strong className="text-text">How this relates to WHIR:</strong> Reed-Solomon codes are the
+        mathematical foundation that WHIR is built on. WHIR is a <em>proximity test</em> for
+        Reed-Solomon codes — it checks whether a committed polynomial is "close" to a valid
+        low-degree polynomial without reading all of its evaluations. The redundancy that RS codes
+        provide is what makes this possible: a dishonest prover cannot fake a low-degree polynomial
+        without being caught by random spot-checks, because the redundancy structure constrains
+        what valid codewords look like.
+      </p>
+
       <h3 id="what-are-rs-codes" className="font-heading text-xl font-semibold text-text mb-3">
         What Are Reed-Solomon Codes?
       </h3>

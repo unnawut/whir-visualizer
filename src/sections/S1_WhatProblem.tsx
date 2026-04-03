@@ -378,6 +378,9 @@ export function S1_WhatProblem() {
                 which is <strong>not quantum-resistant</strong> — the very threat leanMultisig is
                 designed to address.
               </p>
+              <p className="text-xs text-text-muted mt-2 mb-2">
+                <strong>Used by:</strong> Zcash (2018–present), Tornado Cash, Filecoin, Loopring (2019–2022).
+              </p>
               <div className="flex flex-wrap gap-2 mt-2">
                 <span className="text-xs bg-green/10 text-green rounded-full px-2 py-0.5">Tiny proofs</span>
                 <span className="text-xs bg-green/10 text-green rounded-full px-2 py-0.5">Fast verification</span>
@@ -418,6 +421,9 @@ export function S1_WhatProblem() {
                 linear <InlineMath tex="m" /> factor makes verification cost grow with the problem
                 size. FRI also lacks a natural multilinear PCS mode, which leanMultisig needs for its
                 simple stacking technique.
+              </p>
+              <p className="text-xs text-text-muted mt-2 mb-2">
+                <strong>Used by:</strong> StarkNet/StarkEx (2020–present), Polygon Miden, Plonky2/Plonky3 (Polygon, 2022–present), zkSync Era (via Boojum, 2023–present), RISC Zero.
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <span className="text-xs bg-green/10 text-green rounded-full px-2 py-0.5">No trusted setup</span>
@@ -460,6 +466,9 @@ export function S1_WhatProblem() {
                 in the millisecond range. Not fast enough for leanMultisig's recursive aggregation,
                 where verification happens inside the circuit at every tree level.
               </p>
+              <p className="text-xs text-text-muted mt-2 mb-2">
+                <strong>Used by:</strong> Research/academic stage — no production deployments yet.
+              </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <span className="text-xs bg-green/10 text-green rounded-full px-2 py-0.5">Fewer queries than FRI</span>
                 <span className="text-xs bg-green/10 text-green rounded-full px-2 py-0.5">Smaller proofs</span>
@@ -501,6 +510,9 @@ export function S1_WhatProblem() {
                 concatenated into one and committed via a single WHIR instance. No need for
                 univariate FFT-based commitment like FRI or Plonky3. Being hash-based, it is
                 post-quantum secure and requires no trusted setup.
+              </p>
+              <p className="text-xs text-text-muted mt-2 mb-2">
+                <strong>Used by:</strong> LeanMultisig (2025–present), Whirlaway (LambdaClass), ProveKit (World Foundation). Plonky3 integration via whir-p3 (community port). Scroll's Ceno zkVM evaluating as a replacement for BaseFold.
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <span className="text-xs bg-green/10 text-green rounded-full px-2 py-0.5">Fastest verification</span>
