@@ -2,7 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [react(), tailwindcss()],
-  base: '/whir-visualizer/',
-})
+  // Only apply the GH Pages subpath for production builds — keeping it in dev
+  // can break Vite's HMR WebSocket and force full reloads.
+  base: command === 'build' ? '/whir-visualizer/' : '/',
+}))
