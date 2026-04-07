@@ -41,8 +41,9 @@ export const SECTIONS = [
     id: 'sumcheck',
     label: 'The Sumcheck Protocol',
     subs: [
-      { label: 'How Sumcheck Works', id: 'how-sumcheck-works' },
+      { label: 'Why is the Sum Exponential?', id: 'how-sumcheck-works' },
       { label: 'Step-by-Step Example', id: 'sumcheck-step-by-step' },
+      { label: 'Sumcheck Walkthrough', id: 'sumcheck-walkthrough' },
     ],
   },
   {
