@@ -99,10 +99,22 @@ export function S6_Folding() {
         <InlineMath tex="k" /> is the folding parameter. In leanMultisig, the initial domain
         might span <InlineMath tex="2^{26}" /> points. The leanMultisig paper specifies an
         "initial folding of 7," meaning the first fold step reduces the domain by{' '}
-        <InlineMath tex="2^7 = 128\times" />. The small 2-addicity of the KoalaBear field
+        <InlineMath tex="2^7 = 128\times" />. The small 2-adicity of the KoalaBear field
         (24) is handled through WHIR's interleaved Reed-Solomon approach, which allows
         committing up to <InlineMath tex="2^{30}" /> field elements at rate 1/2.
       </p>
+      <div className="bg-bg-card border border-border rounded-lg p-4 my-4 text-sm text-text-muted">
+        <div className="font-semibold text-text mb-1">What's 2-adicity?</div>
+        A field's <strong>2-adicity</strong> is the largest <InlineMath tex="n" /> such
+        that <InlineMath tex="2^n" /> divides <InlineMath tex="p - 1" /> (where{' '}
+        <InlineMath tex="p" /> is the field's prime). It caps the size of the
+        power-of-two evaluation domains Reed-Solomon can use natively. KoalaBear's
+        2-adicity is 24, meaning a single RS codeword tops out at{' '}
+        <InlineMath tex="2^{24}" /> points — too small for leanMultisig traces.
+        WHIR's <em>interleaved</em> Reed-Solomon side-steps this by packing multiple
+        codewords into one block, pushing the effective commitment size up to{' '}
+        <InlineMath tex="2^{30}" /> elements.
+      </div>
 
       <h3 className="font-heading text-lg font-semibold text-text mt-6 mb-2">
         The Folding Formula

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Layout, SECTIONS } from './components/Layout'
+import { Layout } from './components/Layout'
+import { SECTIONS } from './sections'
 import { S0_Introduction } from './sections/S0_Introduction'
 import { S1_WhatProblem } from './sections/S1_WhatProblem'
 import { S3_ReedSolomon } from './sections/S3_ReedSolomon'
