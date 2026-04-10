@@ -60,6 +60,9 @@ export function S7_WhirIteration() {
         to verify the folding was done correctly, rather than re-doing the entire
         fold.
       </p>
+      <h3 id="protocol-at-a-glance" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
+        The Protocol at a Glance
+      </h3>
       <p className="my-4">
         Each iteration follows the same five moves, alternating between prover and
         verifier:
@@ -87,9 +90,6 @@ export function S7_WhirIteration() {
         check that the transformation was honest, and step 5 restates the result
         as a new (smaller) CRS claim for the next iteration.
       </p>
-      <h3 id="protocol-at-a-glance" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
-        The Protocol at a Glance
-      </h3>
       {/* Shrinking CRS illustration with pipeline boxes */}
       {(() => {
         const circles = [
