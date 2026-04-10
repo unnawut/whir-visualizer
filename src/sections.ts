@@ -55,15 +55,21 @@ export const SECTIONS = [
   {
     id: 'one-iteration',
     label: 'The WHIR Protocol',
-    subs: [],
+    subs: [
+      { label: 'Putting the Pieces Together', id: 'putting-pieces-together' },
+      { label: 'The Protocol at a Glance', id: 'protocol-at-a-glance' },
+      { label: 'Step-by-Step Walkthrough', id: 'step-by-step-walkthrough' },
+    ],
   },
   {
     id: 'full-protocol',
     label: 'Tuning the Protocol',
     subs: [
       { label: 'Overview', id: 'full-protocol-overview' },
-      { label: 'Funnel Visualization', id: 'funnel-visualization' },
       { label: 'The k Tradeoff', id: 'k-tradeoff' },
+      { label: 'Queries per Round', id: 'queries-per-round' },
+      { label: 'Code Rate', id: 'code-rate' },
+      { label: 'Interactive Funnel', id: 'funnel-visualization' },
     ],
   },
   {
