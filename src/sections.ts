@@ -54,12 +54,12 @@ export const SECTIONS = [
   },
   {
     id: 'one-iteration',
-    label: 'One WHIR Iteration',
+    label: 'The WHIR Protocol',
     subs: [],
   },
   {
     id: 'full-protocol',
-    label: 'The Full Protocol',
+    label: 'Tuning the Protocol',
     subs: [
       { label: 'Overview', id: 'full-protocol-overview' },
       { label: 'Funnel Visualization', id: 'funnel-visualization' },
