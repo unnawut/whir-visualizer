@@ -81,13 +81,18 @@ export function S8_Summary() {
 
       <div className="bg-bg-card border border-border rounded-lg p-5 my-6">
         <h4 className="font-heading font-semibold text-base text-text mb-3">
-          Verification complexity comparison
+          Query complexity comparison
         </h4>
         <p className="text-sm text-text-muted mb-3">
-          Total verifier work (hash operations) across all rounds. Here{' '}
+          Number of queries (Merkle openings) the verifier makes. Here{' '}
           <InlineMath tex="\lambda" /> is the security parameter,{' '}
           <InlineMath tex="\rho" /> is the code rate, and{' '}
           <InlineMath tex="n" /> is the codeword length.
+          Fewer queries = smaller proof, faster verification. See
+          the{' '}
+          <a href="https://eprint.iacr.org/2024/1586" target="_blank" rel="noopener noreferrer" className="underline hover:text-sienna">
+            WHIR paper
+          </a> (Table 1) for the precise total verifier complexity.
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {queryComplexityFormulas.map(([protocol, formula]) => (
@@ -243,8 +248,8 @@ export function S8_Summary() {
         <li>
           <a href="https://eprint.iacr.org/2024/390" target="_blank" rel="noopener noreferrer" className="underline hover:text-sienna">
             STIR paper
-          </a> — the predecessor that introduced out-of-domain sampling and
-          rate-shifting for RS proximity testing.
+          </a> — the predecessor that introduced rate-shifting across rounds,
+          achieving near-optimal query complexity for RS proximity testing.
         </li>
         <li>
           <a href="https://github.com/leanEthereum/leanMultisig" target="_blank" rel="noopener noreferrer" className="underline hover:text-sienna">

@@ -97,7 +97,7 @@ export function S6_WhirProtocol() {
           <strong>Sumcheck rounds</strong> — the prover runs <InlineMath tex="k" /> rounds of sumcheck, collapsing the algebraic constraint one variable at a time.
         </li>
         <li>
-          <strong>Send folded function</strong> — using the sumcheck challenges as folding randomness, the prover halves the polynomial's domain and sends the new evaluations.
+          <strong>Send folded function</strong> — using the sumcheck challenges as folding randomness, the prover shrinks the polynomial's domain and sends the new evaluations.
         </li>
         <li>
           <strong>Out-of-domain probe</strong> — the prover evaluates the folded polynomial at a challenge point <em>outside</em> the domain.

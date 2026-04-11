@@ -20,18 +20,11 @@ const stages = [
   },
   {
     id: 'pcs',
-    label: 'Polynomial Commitment',
+    label: 'Commitment + Proof (WHIR)',
     highlight: true,
     color: '#8b4513',
     description:
-      'This is where WHIR fits in. LeanMultisig uses WHIR — not FRI or STIR — as its polynomial commitment scheme (multilinear PCS). We need to verify that the committed polynomials are "close" to valid low-degree polynomials. Rather than reading the entire function (which could be huge), WHIR uses a clever combination of sumcheck and folding to test proximity by reading only a tiny fraction of the data. WHIR\'s super-fast verification is what makes recursive aggregation practical.',
-  },
-  {
-    id: 'composition',
-    label: 'Proof Composition',
-    color: '#1a365d',
-    description:
-      'The final product: a Succinct Non-interactive ARGument. This is a short proof that anyone can verify quickly without any interaction with the prover. For leanMultisig, this means thousands of leanSig signature verifications are compressed into a single proof that Ethereum validators check in under a millisecond — replacing the enormous cost of verifying each hash-based signature individually.',
+      'This is where WHIR fits in. LeanMultisig uses WHIR — not FRI or STIR — as its polynomial commitment scheme (multilinear PCS). WHIR commits the polynomials via a Merkle tree and produces the proof transcript (sumcheck rounds, folded oracles, OOD answers, shift query openings) in one shot. The result is a succinct proof that anyone can verify quickly. WHIR\'s super-fast verification is what makes recursive aggregation practical — leanMultisig can verify a WHIR proof inside the next proof\'s circuit, nesting proofs to compress thousands of signature checks into one final proof.',
   },
 ];
 
@@ -146,21 +139,20 @@ export function S1_SnargsAndWhir() {
           "the program ran correctly"
         </li>
         <li>
-          <strong>Polynomial commitment</strong> — takes the <em>polynomials</em> (from step 2),
-          produces a <em>compact commitment</em> the verifier can query without seeing
-          the full data. This is the <em>PCS</em> layer — and <strong><em>this is
-          where WHIR lives</em></strong>
-        </li>
-        <li>
-          <strong>Proof composition</strong> — takes the <em>commitment</em> (from step 3)
-          + <em>constraint equations</em> (from step 2), produces a <em>single
-          proof</em> that anyone can verify quickly
+          <strong>Commitment + proof</strong> — takes the <em>polynomials +
+          constraints</em> (from step 2), commits to them via a Merkle tree and
+          produces the <em>proof transcript</em> (sumcheck rounds, folded oracles,
+          OOD answers, shift query openings). <strong><em>This is where WHIR
+          lives</em></strong> — it handles both the commitment and the proximity
+          proof in one shot
         </li>
       </ol>
       <p>
-        WHIR's fast verification at step 3 is what makes <strong>recursive aggregation</strong> practical:
-        LeanMultisig can nest proofs inside proofs, merging thousands of signature checks into one
-        final proof small enough for on-chain verification.
+        WHIR's fast verification at step 3 is what makes <strong>recursive
+        aggregation</strong> practical: leanMultisig can verify a WHIR proof{' '}
+        <em>inside</em> the next proof's circuit, nesting proofs inside proofs to
+        merge thousands of signature checks into one final proof small enough for
+        on-chain verification.
       </p>
 
       <p>
@@ -368,7 +360,7 @@ export function S1_SnargsAndWhir() {
               </div>
               <p className="text-sm text-text-muted mb-2">
                 The gold standard for succinct proofs for nearly a decade. Groth16 produces the
-                smallest proofs (~128 bytes) with the fastest verification (~280k gas on Ethereum).
+                smallest proofs (~128–192 bytes) with the fastest verification (~280k gas on Ethereum).
                 It's based on elliptic curve pairings, which gives it remarkable succinctness.
               </p>
               <p className="text-sm text-text-muted mb-2">
@@ -415,12 +407,10 @@ export function S1_SnargsAndWhir() {
                 univariate polynomial commitment scheme, requiring FFT-based evaluation domains.
               </p>
               <p className="text-sm text-text-muted">
-                <strong>Why not for leanMultisig:</strong> FRI has larger proofs (~150-250 KB) and slower
-                verification. The verifier must make{' '}
-                <InlineMath tex="O(\lambda + \frac{\lambda}{k} \cdot m)" /> queries — the
-                linear <InlineMath tex="m" /> factor makes verification cost grow with the problem
-                size. FRI also lacks a natural multilinear PCS mode, which leanMultisig needs for its
-                simple stacking technique.
+                <strong>Why not for leanMultisig:</strong> FRI has larger proofs (~150–250 KB) and slower
+                verification — the verifier's work grows with the polynomial size
+                (see Section 8 for the complexity comparison). FRI also lacks a natural
+                multilinear PCS mode, which leanMultisig needs for its simple stacking technique.
               </p>
               <p className="text-xs text-text-muted mt-2 mb-2">
                 <strong>Used by:</strong> StarkNet/StarkEx (2020–present), Polygon Miden, Plonky2/Plonky3 (Polygon, 2022–present), zkSync Era (via Boojum, 2023–present), RISC Zero.
@@ -453,16 +443,13 @@ export function S1_SnargsAndWhir() {
                 redundancy) each round, you need fewer queries per round.
               </p>
               <p className="text-sm text-text-muted mb-2">
-                This brought the query complexity down to{' '}
-                <InlineMath tex="O(\lambda + \frac{\lambda}{k} \cdot \log \frac{m}{k})" /> —
-                replacing FRI's linear <InlineMath tex="m" /> with a logarithmic{' '}
-                <InlineMath tex="\log m" />. STIR also matched proof sizes with the best known
-                schemes.
+                This dramatically reduced the number of queries — replacing FRI's
+                dependency on the polynomial size with a logarithmic factor. STIR
+                also matched proof sizes with the best known schemes.
               </p>
               <p className="text-sm text-text-muted">
                 <strong>What remained:</strong> STIR's verifier, while making fewer queries,
-                still did <InlineMath tex="O(\frac{\lambda^2}{k} \cdot 2^k)" /> field operations
-                per query — the per-query cost was high, keeping total verification time
+                still had expensive per-query costs that kept total verification time
                 in the millisecond range. Not fast enough for leanMultisig's recursive aggregation,
                 where verification happens inside the circuit at every tree level.
               </p>
@@ -483,7 +470,7 @@ export function S1_SnargsAndWhir() {
         <div className="bg-bg-card border-2 border-sienna rounded-lg p-5">
           <div className="flex items-start gap-3">
             <div className="text-xs font-mono bg-sienna text-white rounded px-2 py-0.5 mt-0.5 shrink-0">
-              2025
+              2024
             </div>
             <div>
               <div className="font-heading font-semibold text-base text-sienna mb-1">
@@ -498,10 +485,10 @@ export function S1_SnargsAndWhir() {
               </p>
               <p className="text-sm text-text-muted mb-2">
                 The result: verification in <strong>hundreds of microseconds</strong> instead of
-                milliseconds. WHIR's verifier does{' '}
-                <InlineMath tex="O(q_{\text{WHIR}} \cdot (2^k + m))" /> field operations total —
-                linear in the data it reads, with no field divisions required. This makes it the
-                fastest known verifier for proximity testing.
+                milliseconds. WHIR's verification time is independent of the polynomial
+                size — it depends only on the security parameter and code rate (see Section 8
+                for the precise complexity). This makes it the fastest known verifier for
+                proximity testing.
               </p>
               <p className="text-sm text-text-muted mb-2">
                 <strong>Why leanMultisig chose WHIR:</strong> WHIR functions as a multilinear polynomial
