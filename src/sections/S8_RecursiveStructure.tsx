@@ -30,11 +30,13 @@ export function S8_RecursiveStructure() {
 
   const totalIterations = iterations.length - 1; // exclude base case row
 
-  // Simplified: bits of security per query ≈ -log2(ρ) / k.
-  // Higher k worsens per-query soundness (cheater has more room to hide
-  // across 2^k cosets), so you need more queries to compensate.
-  const bitsPerQuery = Math.max(rateExp / k, 0.01);
-  const securityLevel = Math.floor(queriesPerRound * bitsPerQuery);
+  // Simplified security model:
+  // Each query gives ~log2(1/ρ) = rateExp bits of security.
+  // Union bound over M iterations costs log2(M) bits.
+  // security ≈ t × rateExp − log2(⌈m/k⌉)
+  const securityLevel = Math.max(0, Math.floor(
+    queriesPerRound * rateExp - Math.log2(totalIterations)
+  ));
 
   // Proof size estimate: each query opens a Merkle path of depth log2(domainSize/rate).
   // Per iteration: t × merkleDepth hashes. Total across all iterations.
@@ -65,8 +67,9 @@ export function S8_RecursiveStructure() {
   // Same as proofEstimate (t × merkle_depth per iteration, summed).
   const verifierHashes = proofEstimate;
 
-  // Rough time: ~100ns per hash (Poseidon-like)
-  const NS_PER_HASH = 100;
+  // Rough time: ~15ns per hash (optimized Poseidon over KoalaBear with SIMD)
+  // Calibrated to match leanMultisig's reported ~1s proving time
+  const NS_PER_HASH = 15;
   const formatTime = (hashes: number) => {
     const ns = hashes * NS_PER_HASH;
     if (ns < 1_000) return `${ns} ns`;
@@ -226,7 +229,7 @@ export function S8_RecursiveStructure() {
       <p className="mb-4">
         Try moving each slider one at a time to see how a single parameter
         affects security, proof size, and proving/verification time. Then
-        hit <strong>leanMultisig preset</strong> to see the real-world configuration.
+        hit <strong>leanMultisig preset</strong> to see its configuration.
       </p>
       <div className="bg-bg-card border border-border rounded-lg p-5 space-y-5">
         {/* Sliders + Reset */}
@@ -265,10 +268,10 @@ export function S8_RecursiveStructure() {
 
         <div className="flex items-center justify-end">
           <button
-            onClick={() => { setK(7); setRateExp(1); setQueriesPerRound(100); }}
+            onClick={() => { setK(7); setRateExp(1); setQueriesPerRound(105); }}
             className="cursor-pointer text-[11px] text-text-muted hover:text-sienna transition-colors underline underline-offset-2"
           >
-            Apply leanMultisig preset (k=7, ρ=1/2, t=100)
+            Apply leanMultisig-like preset (k=7, ρ=1/2, t≈105)
           </button>
         </div>
 
@@ -309,9 +312,9 @@ export function S8_RecursiveStructure() {
               label: 'Proving time',
               value: `~${formatTime(proverHashes)}`,
               sub: `~${(proverHashes / 1e6).toFixed(1)}M hashes`,
-              // Log scale calibrated for m=25: ~6s (best) to ~600s (worst with high rate)
-              pct: Math.min(Math.max((Math.log10(Math.max(proveMs, 1)) - 3) / 3, 0.05), 1),
-              color: proveMs < 5000 ? '#2f855a' : proveMs < 30000 ? '#1a365d' : '#c53030',
+              // Log scale calibrated for m=25: ~1s (best) to ~100s (worst with high rate)
+              pct: Math.min(Math.max((Math.log10(Math.max(proveMs, 1)) - 2) / 3, 0.05), 1),
+              color: proveMs < 2000 ? '#2f855a' : proveMs < 10000 ? '#1a365d' : '#c53030',
             },
             {
               label: 'Verification time',
@@ -347,8 +350,15 @@ export function S8_RecursiveStructure() {
         })()}
 
 
-        <div className="text-[9px] text-text-muted text-center">
-          Time estimates assume ~100ns/hash (Poseidon-like). Actual times vary with hardware and hash function.
+        <div className="text-xs text-text-muted space-y-1 border-t border-border-light pt-3 mt-2">
+          <div className="font-semibold text-text text-sm">Assumptions (simplified model)</div>
+          <ul className="list-disc ml-4 space-y-0.5">
+            <li><strong>Security:</strong> <InlineMath tex="\lambda \approx t \times \log_2(1/\rho) - \log_2(\lceil m/k \rceil)" />. Each query gives ~<InlineMath tex="\log_2(1/\rho)" /> bits of security, minus a union bound over iterations. Real WHIR uses the Johnson Bound for tighter analysis.</li>
+            <li><strong>Proof size:</strong> <InlineMath tex="t \times \text{(Merkle depth per iteration)}" /> summed across iterations, at 32 bytes per hash. Excludes sumcheck polynomials and other small prover messages.</li>
+            <li><strong>Proving time:</strong> modeled as Merkle tree construction (<InlineMath tex="\sim 2^{m + \log_2(1/\rho)}" /> hashes for the first iteration). Uses ~15ns effective cost per hash operation, calibrated to match leanMultisig's reported ~1s total proving time on modern x86-64 hardware (AVX-512/SIMD, multi-threaded, e.g. AMD EPYC or Intel Xeon). This effective rate absorbs NTT, sumcheck, folding, and field arithmetic into the hash cost.</li>
+            <li><strong>Verification time:</strong> <InlineMath tex="t \times \text{(Merkle depth)}" /> hash checks per iteration, same ~15ns effective cost. Verification is single-threaded and memory-light — representative of commodity hardware (laptop or server).</li>
+            <li><strong>leanMultisig preset:</strong> Uses k=7 initial / k=5 subsequent (simplified to k=7 here), ρ=1/2 for leaf proofs, 123-bit hash security with 18-bit proof-of-work grinding giving ~105-bit effective query security. Queries are computed dynamically via the Johnson Bound, not hardcoded.</li>
+          </ul>
         </div>
 
       </div>
