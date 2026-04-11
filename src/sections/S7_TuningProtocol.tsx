@@ -78,8 +78,6 @@ export function S7_TuningProtocol() {
     return `${(ns / 1_000_000_000).toFixed(2)} s`;
   };
 
-  const maxBarWidth = 500;
-
   return (
     <Section
       id="full-protocol"

@@ -43,7 +43,6 @@ export function S4_Sumcheck() {
   // Row 11: padding (0)
   // Committed outputs: 3, 4, 8, 0
   const row10Error = ((8 - (4 + charlieScore) % 17) % 17 + 17) % 17;
-  const totalWeightedSum = row10Error;
 
   const result = useMemo(
     () => simulateFullSumcheck(POLY, CHALLENGES),

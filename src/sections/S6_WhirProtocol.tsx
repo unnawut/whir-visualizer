@@ -122,7 +122,6 @@ export function S6_WhirProtocol() {
           { label: 'After iteration 1', points: 4, r: 36 },
           { label: 'After iteration 2', points: 2, r: 24 },
         ];
-        const maxR = 48;
         const ga = Math.PI * (3 - Math.sqrt(5));
 
         const renderCircle = (step: typeof circles[0]) => {

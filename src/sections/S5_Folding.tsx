@@ -11,7 +11,6 @@ import {
 import { Section } from '../components/Section';
 import { Math as InlineMath, MathBlock } from '../components/MathBlock';
 import { Button } from '../components/ui/Button';
-import { Slider } from '../components/ui/Slider';
 import { generateSubgroup } from '../utils/field';
 import { evaluateAll, interpolate, degree } from '../utils/polynomial';
 import type { Poly } from '../utils/polynomial';

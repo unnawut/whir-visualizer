@@ -150,8 +150,8 @@ export function S8_Summary() {
               />
               <Tooltip
                 contentStyle={{ fontSize: 11, fontFamily: 'monospace' }}
-                formatter={(value: number, name: string) => [value.toLocaleString(), name]}
-                labelFormatter={(logN: number) => `n = 2^${logN}`}
+                formatter={(value) => [Number(value).toLocaleString()]}
+                labelFormatter={(logN) => `n = 2^${logN}`}
               />
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Line type="monotone" dataKey="WHIR" stroke="#8b4513" strokeWidth={3} dot={false} />
