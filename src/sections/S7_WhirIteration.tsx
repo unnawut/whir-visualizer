@@ -52,13 +52,35 @@ export function S7_WhirIteration() {
         checks</strong> that catch a dishonest prover.
       </p>
       <p className="my-4">
-        Two new ideas fill that gap. The <strong>out-of-domain probe</strong>: a
-        cheating prover could fake values that look correct at every domain point
-        but diverge elsewhere — the verifier catches this by testing at a random
-        surprise point outside the domain. And <strong>consistency queries</strong>: the
-        verifier spot-checks a few positions from the original committed polynomial
-        to verify the folding was done correctly, rather than re-doing the entire
-        fold.
+        Two new ideas fill that gap:
+      </p>
+      <ul className="list-disc ml-6 my-4 space-y-2">
+        <li>
+          <strong>Out-of-domain probe</strong>: a cheating prover could fake values that look correct at every
+          domain point but diverge elsewhere. The verifier catches this by
+          testing at a random surprise point outside the domain — this works
+          because two different low-degree polynomials disagree at almost every
+          random point (Schwartz-Zippel lemma).
+        </li>
+        <li>
+          <strong>Consistency queries</strong>: the verifier spot-checks a few
+          positions from the original committed polynomial to verify the folding
+          was done correctly. This is the same random-sampling idea from Section 2
+          (Reed-Solomon) — but instead of checking "is this point on the
+          polynomial?", it checks "does this point fold correctly?"
+        </li>
+      </ul>
+      <p className="my-4">
+        The order of these two checks matters: the OOD challenge is derived by
+        hashing the transcript after the prover sends the folded commitment, and
+        the query positions are derived after the OOD answer is added. This way
+        the prover can't tailor either response to a challenge that hasn't been
+        computed yet.
+      </p>
+      <p className="my-4">
+        With all the pieces in place — CRS as the claim structure, sumcheck and
+        folding to transform it, OOD probes and consistency queries to keep the
+        prover honest — here's how they fit together in one iteration.
       </p>
       <h3 id="protocol-at-a-glance" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
         The Protocol at a Glance
