@@ -303,7 +303,8 @@ const WALK_STEPS = [
   { label: 'Iteration 2: Fold', desc: 'The 4 evaluations are folded into 2.' },
   { label: 'Iteration 2: OOD probe', desc: 'Another surprise evaluation outside the new domain.' },
   { label: 'Iteration 2: Shift queries', desc: 'Spot-check fold consistency on the smaller domain.' },
-  { label: 'Iteration 2: Complete', desc: 'Only 2 points remain — small enough for the verifier to check directly. Done!' },
+  { label: 'Iteration 2: Complete', desc: 'Only 2 points remain — small enough for the verifier to check directly.' },
+  { label: 'Finish!', desc: 'The verifier is convinced the prover\'s trace is valid — without ever reading the full table.' },
 ];
 
 function IterationWalkthrough() {
@@ -342,6 +343,33 @@ function IterationWalkthrough() {
   const circleRAfter = step < 5 ? 60 : step < 10 ? 40 : 40;
 
   const renderCanvas = () => {
+    // Finish step
+    if (step === 11) return (
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="mx-auto block">
+        <motion.circle
+          cx={CX} cy={CY} r={20}
+          fill="#2f855a"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5, type: 'spring', stiffness: 200 }}
+        />
+        <motion.text
+          x={CX} y={CY + 5}
+          textAnchor="middle" fontSize="16" fill="white" fontFamily="monospace" fontWeight="bold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >✓</motion.text>
+        <motion.text
+          x={CX} y={CY + 45}
+          textAnchor="middle" fontSize="14" fill="#2f855a" fontFamily="monospace"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >Proof verified</motion.text>
+      </svg>
+    );
+
     const phase = step < 5 ? step : step < 10 ? step - 5 : step - 10;
 
     // Which circle/dots to show as the base layer
@@ -690,6 +718,8 @@ function IterationWalkthrough() {
         )}
       </svg>
     );
+
+    return null;
   };
 
   return (
@@ -700,6 +730,7 @@ function IterationWalkthrough() {
           { label: 'Start', range: [0, 0] },
           { label: 'Iteration 1', range: [1, 5] },
           { label: 'Iteration 2', range: [6, 10] },
+          { label: 'Finish!', range: [11, 11] },
         ].map((seg, si) => {
           const [lo, hi] = seg.range;
           const totalInSeg = hi - lo + 1;
@@ -708,7 +739,7 @@ function IterationWalkthrough() {
           const isActive = step >= lo && step <= hi;
           const isDone = step > hi;
           return (
-            <div key={si} className={si === 0 ? 'w-12 shrink-0' : 'flex-1'}>
+            <div key={si} className={si === 0 || si === 3 ? 'w-14 shrink-0' : 'flex-1'}>
               <div className="text-[9px] font-mono text-text-muted mb-0.5 text-center">
                 <span className={isActive ? 'text-text font-semibold' : isDone ? 'text-green' : ''}>
                   {seg.label}
