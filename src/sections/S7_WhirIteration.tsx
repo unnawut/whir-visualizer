@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Section } from '../components/Section';
 import { Math as InlineMath } from '../components/MathBlock';
@@ -60,14 +60,17 @@ export function S7_WhirIteration() {
           domain point but diverge elsewhere. The verifier catches this by
           testing at a random surprise point outside the domain — this works
           because two different low-degree polynomials disagree at almost every
-          random point (Schwartz-Zippel lemma).
+          random point (<a href="https://en.wikipedia.org/wiki/Schwartz%E2%80%93Zippel_lemma" target="_blank" rel="noopener noreferrer" className="underline hover:text-sienna">Schwartz–Zippel lemma</a>).
         </li>
         <li>
-          <strong>Consistency queries</strong>: the verifier spot-checks a few
+          <strong>Shift queries</strong>: the verifier spot-checks a few
           positions from the original committed polynomial to verify the folding
-          was done correctly. This is the same random-sampling idea from Section 2
-          (Reed-Solomon) — but instead of checking "is this point on the
-          polynomial?", it checks "does this point fold correctly?"
+          was done correctly. Called "shift" because the verifier checks
+          consistency between the original domain <InlineMath tex="L" /> and
+          the smaller domain <InlineMath tex="L^k" /> that the fold maps onto.
+          This is the same random-sampling idea from Section 2 (Reed-Solomon) —
+          but instead of checking "is this point on the polynomial?", it checks
+          "does this point fold correctly?"
         </li>
       </ul>
       <p className="my-4">
@@ -79,7 +82,7 @@ export function S7_WhirIteration() {
       </p>
       <p className="my-4">
         With all the pieces in place — CRS as the claim structure, sumcheck and
-        folding to transform it, OOD probes and consistency queries to keep the
+        folding to transform it, OOD probes and shift queries to keep the
         prover honest — here's how they fit together in one iteration.
       </p>
       <h3 id="protocol-at-a-glance" className="font-heading text-xl font-semibold text-text mt-10 mb-4">
@@ -100,7 +103,7 @@ export function S7_WhirIteration() {
           <strong>Out-of-domain probe</strong> — the prover evaluates the folded polynomial at a challenge point <em>outside</em> the domain.
         </li>
         <li>
-          <strong>Consistency queries</strong> — the verifier opens a few Merkle positions from the committed polynomial and checks the fold was computed correctly.
+          <strong>Shift queries</strong> — the verifier opens a few Merkle positions from the committed polynomial and checks the fold was computed correctly.
         </li>
         <li>
           <strong>Rinse and repeat</strong> — the output becomes the input to the next iteration, now on a half-sized domain.
@@ -116,8 +119,8 @@ export function S7_WhirIteration() {
       {(() => {
         const circles = [
           { label: 'Start', points: 8, r: 48 },
-          { label: 'After iter 1', points: 4, r: 36 },
-          { label: 'After iter 2', points: 2, r: 24 },
+          { label: 'After iteration 1', points: 4, r: 36 },
+          { label: 'After iteration 2', points: 2, r: 24 },
         ];
         const maxR = 48;
         const ga = Math.PI * (3 - Math.sqrt(5));
@@ -229,7 +232,7 @@ export function S7_WhirIteration() {
                   );
                 })}
               </svg>
-              <span className="text-[7px] text-green font-mono">queries</span>
+              <span className="text-[7px] text-green font-mono">shift queries</span>
             </div>
           );
         };
@@ -291,21 +294,33 @@ export function S7_WhirIteration() {
 
 const WALK_STEPS = [
   { label: 'Start', desc: 'The prover has committed to a polynomial evaluated at 8 domain points.' },
-  { label: 'Sumcheck (iter 1)', desc: 'Sumcheck collapses the constraint across all 8 points into a single evaluation claim.' },
-  { label: 'Fold (iter 1)', desc: 'Using the sumcheck challenges, the 8 evaluations are folded into 4.' },
-  { label: 'OOD probe (iter 1)', desc: 'The prover evaluates the folded polynomial at a surprise point outside the domain.' },
-  { label: 'Queries (iter 1)', desc: 'The verifier spot-checks a few positions to verify the fold was done correctly.' },
-  { label: 'After iter 1', desc: 'The domain has shrunk from 8 to 4 points. Same CRS claim, smaller table.' },
-  { label: 'Sumcheck (iter 2)', desc: 'Sumcheck collapses the constraint across the 4 remaining points.' },
-  { label: 'Fold (iter 2)', desc: 'The 4 evaluations are folded into 2.' },
-  { label: 'OOD probe (iter 2)', desc: 'Another surprise evaluation outside the new domain.' },
-  { label: 'Queries (iter 2)', desc: 'Spot-check fold consistency on the smaller domain.' },
-  { label: 'After iter 2', desc: 'Only 2 points remain — small enough for the verifier to check directly. Done!' },
+  { label: 'Iteration 1: Sumcheck', desc: 'Sumcheck collapses the constraint across all 8 points into a single evaluation claim.' },
+  { label: 'Iteration 1: Fold', desc: 'Using the sumcheck challenges, the 8 evaluations are folded into 4.' },
+  { label: 'Iteration 1: OOD probe', desc: 'The prover evaluates the folded polynomial at a surprise point outside the domain.' },
+  { label: 'Iteration 1: Shift queries', desc: 'The verifier spot-checks a few positions to verify the fold was done correctly.' },
+  { label: 'Iteration 1: Complete', desc: 'The domain has shrunk from 8 to 4 points. Same CRS claim, smaller table.' },
+  { label: 'Iteration 2: Sumcheck', desc: 'Sumcheck collapses the constraint across the 4 remaining points.' },
+  { label: 'Iteration 2: Fold', desc: 'The 4 evaluations are folded into 2.' },
+  { label: 'Iteration 2: OOD probe', desc: 'Another surprise evaluation outside the new domain.' },
+  { label: 'Iteration 2: Shift queries', desc: 'Spot-check fold consistency on the smaller domain.' },
+  { label: 'Iteration 2: Complete', desc: 'Only 2 points remain — small enough for the verifier to check directly. Done!' },
 ];
 
 function IterationWalkthrough() {
   const [step, setStep] = useState(0);
   const ga = Math.PI * (3 - Math.sqrt(5));
+
+  const prev = useCallback(() => setStep((s) => Math.max(0, s - 1)), []);
+  const next = useCallback(() => setStep((s) => Math.min(WALK_STEPS.length - 1, s + 1)), []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') next();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [prev, next]);
 
   // Helper to generate dot positions inside a circle
   const dots = (n: number, r: number, cx: number, cy: number) =>
@@ -557,7 +572,7 @@ function IterationWalkthrough() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.6 }}
                 transition={{ delay: 2.3 }}
-              >✓ spot-check fold consistency</motion.text>
+              >✓ shift queries</motion.text>
             </>
           );
         })()}
@@ -663,14 +678,14 @@ function IterationWalkthrough() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-            >spot-check</motion.text>
+            >shift</motion.text>
             <motion.text
               x={CX + circleRAfter + 20} y={CY + 8}
               textAnchor="start" fontSize="10" fill="#2f855a" fontFamily="monospace"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-            >fold consistency</motion.text>
+            >queries</motion.text>
           </>
         )}
       </svg>
@@ -693,7 +708,7 @@ function IterationWalkthrough() {
           const isActive = step >= lo && step <= hi;
           const isDone = step > hi;
           return (
-            <div key={si} className="flex-1">
+            <div key={si} className={si === 0 ? 'w-12 shrink-0' : 'flex-1'}>
               <div className="text-[9px] font-mono text-text-muted mb-0.5 text-center">
                 <span className={isActive ? 'text-text font-semibold' : isDone ? 'text-green' : ''}>
                   {seg.label}
@@ -725,10 +740,10 @@ function IterationWalkthrough() {
         <Button variant="ghost" onClick={() => setStep(0)} disabled={step === 0}>
           Reset
         </Button>
-        <Button variant="ghost" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0}>
+        <Button variant="ghost" onClick={prev} disabled={step === 0}>
           Prev
         </Button>
-        <Button variant="primary" onClick={() => setStep((s) => Math.min(WALK_STEPS.length - 1, s + 1))} disabled={step === WALK_STEPS.length - 1}>
+        <Button variant="primary" onClick={next} disabled={step === WALK_STEPS.length - 1}>
           Next
         </Button>
       </div>
