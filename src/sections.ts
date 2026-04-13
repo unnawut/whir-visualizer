@@ -3,7 +3,7 @@ export const SECTIONS = [
     id: 'introduction',
     label: 'About',
     subs: [
-      { label: 'About This Visualizer', id: 'about-this-visualizer' },
+      { label: 'WHIR — A Gentle Introduction', id: 'about-this-visualizer' },
       { label: 'The Papers', id: 'the-papers' },
       { label: 'Simplifications', id: 'simplifications' },
       { label: 'How the Demos Work', id: 'how-demos-work' },

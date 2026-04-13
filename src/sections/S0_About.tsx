@@ -9,19 +9,20 @@ export function S0_About() {
       subtitle="An interactive guide to understanding the WHIR protocol — the polynomial commitment scheme inside leanMultisig."
     >
       <h3 id="about-this-visualizer" className="font-heading text-xl font-semibold text-text mb-3">
-        About This Visualizer
+        WHIR — A Gentle Introduction
       </h3>
       <p>
-        This visualizer explains <strong>WHIR</strong> (Weights Help Improving Rate), the polynomial
-        commitment scheme used inside <strong>LeanMultisig</strong> — a minimal zkVM designed to aggregate
+        This is an interactive, step-by-step guide to <strong>WHIR</strong> (Weights
+        Help Improving Rate), the polynomial commitment scheme used
+        inside <strong>LeanMultisig</strong> — a minimal zkVM designed to aggregate
         post-quantum hash-based signatures for Ethereum.
       </p>
       <p className="mt-3">
         Ethereum's consensus layer currently relies on BLS signatures for validator attestations.
         BLS is efficient and supports cheap aggregation, but it is vulnerable to quantum computers.
-        The migration path leads to hash-based signatures like{' '}
+        One candidate migration path is hash-based signatures such as{' '}
         <a href="https://github.com/leanEthereum/leanSig" target="_blank" rel="noopener noreferrer" className="text-sienna hover:underline font-semibold">leanSig</a>,
-        which are quantum-resistant but 10-100x larger than BLS and lack native aggregation. LeanMultisig is a
+        which are quantum-resistant but 10–100x larger than BLS and lack native aggregation. LeanMultisig is a
         minimal zkVM that aggregates thousands of these signatures into a single compact proof using
         a hash-based SNARK powered by WHIR.
       </p>
@@ -71,10 +72,12 @@ export function S0_About() {
         </p>
         <ul className="space-y-2 list-disc ml-5">
           <li>
-            <strong>OOD probe and shift queries are presented as single steps.</strong> In
-            the actual protocol, the out-of-domain sample and the prover's response
-            are two separate messages (verifier sends the challenge, prover responds).
-            We merge them into one step for clarity.
+            <strong>Challenge-response pairs are presented as single steps.</strong> The
+            OOD probe and shift queries each involve two messages — the verifier
+            issues a challenge, then the prover computes a response. In practice,
+            challenges are derived via Fiat-Shamir (the prover computes them from
+            the transcript but cannot control them), hence we present them as
+            single steps.
           </li>
           <li>
             <strong>The folding parameter <InlineMath tex="k" /> is shown as constant.</strong> In
