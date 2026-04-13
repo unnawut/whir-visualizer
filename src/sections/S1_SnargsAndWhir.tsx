@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Section } from '../components/Section';
 import { Math as InlineMath } from '../components/MathBlock';
@@ -9,14 +9,14 @@ const stages = [
     label: 'Execution',
     color: '#1a365d',
     description:
-      'LeanMultisig executes a program that verifies leanSig signatures. The execution trace records every step: ADD, MUL, DEREF, JUMP instructions plus Poseidon2 hashes. A batch of 2,500 signatures produces millions of rows — but the prover wants to convince everyone the result is correct without making them redo the entire thing.',
+      'LeanMultisig executes a program that verifies leanSig signatures. The execution trace records every step: ADD, MUL, DEREF, JUMP instructions plus Poseidon2 hashes. A batch of 2,500 signatures produces millions of rows — but the prover wants to convince everyone the result is correct without verifying millions of rows each time.',
   },
   {
     id: 'arithmetization',
     label: 'Arithmetization',
     color: '#1a365d',
     description:
-      'The execution trace is encoded as multilinear polynomials over the KoalaBear field. LeanMultisig\'s AIR constraints — degree-5 transition polynomials between consecutive rows — become polynomial equations. Instead of checking "did leanMultisig run this program correctly?", we now ask "do these polynomials satisfy certain relationships?" Multiple tables (execution, Poseidon2, extension op) are stacked into a single commitment via WHIR\'s simple stacking technique.',
+      'The execution trace is encoded as multilinear polynomials over the KoalaBear field. Using multilinear (rather than univariate) polynomials lets leanMultisig concatenate multiple table columns — execution, Poseidon2, extension ops — into a single polynomial by simply appending their evaluation tables. LeanMultisig\'s AIR constraints — degree-5 transition polynomials between consecutive rows — become polynomial equations. Instead of checking "did leanMultisig run this program correctly?", we now ask "do these polynomials satisfy certain relationships?"',
   },
   {
     id: 'pcs',
@@ -29,7 +29,20 @@ const stages = [
 ];
 
 export function S1_SnargsAndWhir() {
-  const [activeStage, setActiveStage] = useState<string | null>(null);
+  const [activeStage, setActiveStage] = useState<string | null>(stages[0].id);
+  const [autoPlay, setAutoPlay] = useState(true);
+
+  useEffect(() => {
+    if (!autoPlay) return;
+    const timer = setInterval(() => {
+      setActiveStage((cur) => {
+        const idx = stages.findIndex((s) => s.id === cur);
+        const next = (idx + 1) % stages.length;
+        return stages[next].id;
+      });
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [autoPlay]);
 
   const boxWidth = 220;
   const boxHeight = 40;
@@ -157,11 +170,48 @@ export function S1_SnargsAndWhir() {
 
       <p>
         In leanMultisig, this pipeline turns leanSig signature verifications into a compact proof.
-        Click each stage below to learn more:
       </p>
 
       {/* Pipeline SVG */}
       <div className="bg-bg-card border border-border rounded-lg p-5 my-6">
+      <div className="flex justify-end mb-2">
+        <button
+          onClick={() => setAutoPlay((v) => !v)}
+          className="cursor-pointer flex items-center gap-1.5 text-[10px] text-text-muted hover:text-sienna transition-colors"
+        >
+          {autoPlay ? 'auto-playing' : 'auto-play paused'}
+          {autoPlay && (
+            <svg width="16" height="16" viewBox="0 0 16 16" className="shrink-0">
+              <circle
+                cx="8" cy="8" r="6"
+                fill="none"
+                stroke="#8b4513"
+                strokeWidth="2"
+              />
+              <circle
+                cx="8" cy="8" r="6"
+                fill="none"
+                stroke="#e0dcd4"
+                strokeWidth="2"
+                strokeDasharray={`${2 * Math.PI * 6}`}
+                strokeDashoffset="0"
+                strokeLinecap="round"
+                style={{
+                  transformOrigin: 'center',
+                  transform: 'rotate(-90deg)',
+                  animation: 'countdown 5s linear infinite',
+                }}
+              />
+              <style>{`
+                @keyframes countdown {
+                  from { stroke-dashoffset: ${2 * Math.PI * 6}; }
+                  to { stroke-dashoffset: 0; }
+                }
+              `}</style>
+            </svg>
+          )}
+        </button>
+      </div>
       <div>
         <svg
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}
@@ -220,9 +270,10 @@ export function S1_SnargsAndWhir() {
                   strokeWidth={isHighlighted ? 2.5 : 1.5}
                   filter={isHighlighted ? 'url(#glow)' : undefined}
                   className="cursor-pointer transition-all duration-200"
-                  onClick={() =>
-                    setActiveStage(activeStage === stage.id ? null : stage.id)
-                  }
+                  onClick={() => {
+                    setAutoPlay(false);
+                    setActiveStage(stage.id);
+                  }}
                 />
 
                 {/* Label */}
@@ -367,8 +418,8 @@ export function S1_SnargsAndWhir() {
                 <strong>The catch:</strong> Groth16 requires a <em>trusted setup</em> — a ceremony
                 where secret randomness is generated and must be destroyed. If any participant keeps
                 the secret, they can forge proofs. It also relies on pairing-based cryptography,
-                which is <strong>not quantum-resistant</strong> — the very threat leanMultisig is
-                designed to address.
+                which is <strong>not quantum-resistant</strong> — the very threat leanMultisig
+                aims to address.
               </p>
               <p className="text-xs text-text-muted mt-2 mb-2">
                 <strong>Used by:</strong> Zcash (2018–present), Tornado Cash, Filecoin, Loopring (2019–2022).
@@ -512,7 +563,7 @@ export function S1_SnargsAndWhir() {
         </div>
       </div>
 
-      <p className="text-sm text-text-muted mt-6 italic">
+      <p className="mt-6">
         In the sections that follow, we will build up the ideas behind WHIR step by step:
         Reed-Solomon codes, constrained codes, the sumcheck protocol, and folding — all
         combining into the protocol that powers leanMultisig's polynomial commitment layer.

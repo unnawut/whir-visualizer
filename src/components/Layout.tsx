@@ -31,7 +31,7 @@ export function Layout({ activePage, onNavigate, children }: LayoutProps) {
                 }
               `}
             >
-              {i > 0 && <span className="text-xs text-text-muted mr-1.5">{i}.</span>}
+              <span className="text-xs text-text-muted mr-1.5">{i}.</span>
               {label}
             </button>
             {isActive && subs.length > 0 && (
