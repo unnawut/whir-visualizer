@@ -1,8 +1,18 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import {
+  ComposedChart,
+  Line,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+} from 'recharts';
 import { Section } from '../components/Section';
 import { Math as InlineMath, MathBlock } from '../components/MathBlock';
 import { Slider } from '../components/ui/Slider';
+import { Button } from '../components/ui/Button';
 import { generateSubgroup } from '../utils/field';
 import { evaluate } from '../utils/polynomial';
 
@@ -400,6 +410,8 @@ export function S2_ReedSolomon() {
         be close to <em>any</em> valid codeword.
       </p>
 
+      <RSLineChart />
+
       <h3 id="error-correction-to-proofs" className="font-heading text-xl font-semibold text-text mt-10 mb-3">
         From Error Correction to Proof Systems
       </h3>
@@ -451,5 +463,90 @@ export function S2_ReedSolomon() {
         polynomial to the execution trace.
       </p>
     </Section>
+  );
+}
+
+/**
+ * Interactive line chart: a degree-2 polynomial evaluated at 6 points.
+ * The user can drag one point off the curve to see how tampering is detectable.
+ */
+function RSLineChart() {
+  const xs = [0, 1, 2, 3, 4, 5];
+  const poly = [1, 2, 1]; // 1 + 2x + x²
+  const honest = xs.map((x) => poly[0] + poly[1] * x + poly[2] * x * x);
+
+  const [tamperIdx] = useState(2);
+  const [tamperOffset, setTamperOffset] = useState(0);
+
+  const values = honest.map((y, i) => (i === tamperIdx ? y + tamperOffset : y));
+  const isTampered = tamperOffset !== 0;
+
+  const curve = useMemo(() => {
+    const pts: { x: number; y: number }[] = [];
+    for (let t = 0; t <= 5; t += 0.1) {
+      pts.push({ x: t, y: poly[0] + poly[1] * t + poly[2] * t * t });
+    }
+    return pts;
+  }, []);
+
+  const scatterData = xs.map((x, i) => ({
+    x,
+    y: values[i],
+    tampered: i === tamperIdx && isTampered,
+  }));
+
+  return (
+    <div className="bg-bg-card border border-border rounded-lg p-5 my-6 space-y-3">
+      <div className="text-sm text-text-muted">
+        The polynomial <InlineMath tex="f(x) = 1 + 2x + x^2" /> (degree 2) is
+        evaluated at 6 points — twice as many as needed. Drag the slider to move
+        one point off the curve:
+      </div>
+      <ResponsiveContainer width="100%" height={240}>
+        <ComposedChart margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
+          <CartesianGrid stroke="#e7e3d9" strokeDasharray="3 3" />
+          <XAxis type="number" dataKey="x" domain={[-0.5, 5.5]} ticks={[0, 1, 2, 3, 4, 5]} stroke="#6b6375" fontSize={11} />
+          <YAxis type="number" dataKey="y" domain={[-2, 40]} stroke="#6b6375" fontSize={11} />
+          <Line type="monotone" data={curve} dataKey="y" stroke="#1a365d" strokeWidth={2} dot={false} isAnimationActive={false} xAxisId={0} yAxisId={0} />
+          <Scatter
+            data={scatterData}
+            xAxisId={0} yAxisId={0}
+            shape={(props: { cx?: number; cy?: number; payload?: { tampered: boolean } }) => (
+              <circle cx={props.cx} cy={props.cy} r={7} fill={props.payload?.tampered ? '#c53030' : '#1a365d'} stroke="#fefdfb" strokeWidth={3} />
+            )}
+            isAnimationActive={false}
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
+      <div className="flex items-center gap-4 max-w-[400px] mx-auto">
+        <div className="flex-1">
+          <Slider
+            label={`Tamper f(${xs[tamperIdx]})`}
+            value={tamperOffset}
+            min={-10}
+            max={10}
+            onChange={setTamperOffset}
+            displayValue={
+              tamperOffset === 0 ? (
+                <>{honest[tamperIdx]} (honest)</>
+              ) : (
+                <>
+                  <span className="text-text-muted/50 line-through mr-1">{honest[tamperIdx]}</span>
+                  <span className="text-red">{values[tamperIdx]}</span>
+                </>
+              )
+            }
+          />
+        </div>
+        <Button variant="secondary" onClick={() => setTamperOffset(0)}>
+          Reset
+        </Button>
+      </div>
+      <div className="text-xs text-text-muted text-center">
+        {isTampered
+          ? 'The red point no longer lies on the curve — any verifier sampling this point catches the tampering.'
+          : 'All 6 points lie on the degree-2 curve. The 3 extra points (beyond the 3 needed) are the redundancy.'}
+      </div>
+    </div>
   );
 }
