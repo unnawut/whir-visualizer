@@ -8,6 +8,41 @@ export function S0_About() {
       title="About"
       subtitle="An interactive guide to understanding the WHIR protocol — the polynomial commitment scheme inside leanMultisig."
     >
+      <div className="bg-bg-card border-l-4 border-sienna rounded-r-md p-4 mb-6">
+        <div className="text-xs font-heading font-semibold text-sienna uppercase tracking-wide mb-2">
+          A note on origin
+        </div>
+        <p className="text-sm text-text-muted mb-0">
+          This visualizer was made for{' '}
+          <a
+            href="https://github.com/ReamLabs/ream-study-group"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-sienna"
+          >
+            Ream's study group
+          </a>{' '}
+          session on WHIR. It is <strong>not an authoritative resource</strong>{' '}
+          and may contain inaccuracies — for the precise protocol, refer to the
+          WHIR paper and the leanMultisig source code linked{' '}
+          <a
+            href="#the-papers"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.getElementById('the-papers');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="underline hover:text-sienna"
+          >
+            below
+          </a>
+          . If you spot something wrong, please open an issue on the study
+          group repo. If
+          you'd like to follow along with future sessions or dig deeper into
+          the Lean Ethereum ecosystem, check out the study group there.
+        </p>
+      </div>
+
       <h3 id="about-this-visualizer" className="font-heading text-xl font-semibold text-text mb-3">
         WHIR — A Gentle Introduction
       </h3>
