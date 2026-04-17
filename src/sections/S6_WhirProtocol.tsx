@@ -24,7 +24,7 @@ export function S6_WhirProtocol() {
         <li><strong>Satisfies constraints</strong> — that polynomial satisfies the required equations, meaning the computation was executed correctly.</li>
       </ol>
       <p className="my-4">
-        The previous sections gave us one piece each:
+        The previous sections gave us the building blocks:
       </p>
       <ul className="list-disc ml-6 my-4 space-y-2">
         <li>
@@ -40,7 +40,7 @@ export function S6_WhirProtocol() {
         </li>
         <li>
           <strong>Section 5 (Folding)</strong> — shrinks the polynomial onto a
-          half-sized domain, so the problem gets smaller each round.
+          smaller domain, so the problem gets smaller each round.
         </li>
       </ul>
       <p className="my-4">
@@ -56,11 +56,13 @@ export function S6_WhirProtocol() {
       </p>
       <ul className="list-disc ml-6 my-4 space-y-2">
         <li>
-          <strong>Out-of-domain probe</strong>: a cheating prover could fake values that look correct at every
-          domain point but diverge elsewhere. The verifier catches this by
-          testing at a random surprise point outside the domain — this works
-          because two different low-degree polynomials disagree at almost every
-          random point (<a href="https://en.wikipedia.org/wiki/Schwartz%E2%80%93Zippel_lemma" target="_blank" rel="noopener noreferrer" className="underline hover:text-sienna">Schwartz–Zippel lemma</a>).
+          <strong>Out-of-domain probe</strong>: Reed-Solomon codes are{' '}
+          <em>list-decodable</em> — there may be multiple low-degree polynomials
+          that are "close enough" to the committed values. The OOD probe
+          eliminates these contenders: by evaluating at a random point outside
+          the domain, only the true polynomial can produce the correct answer.
+          This works because two different low-degree polynomials disagree at
+          almost every random point (<a href="https://en.wikipedia.org/wiki/Schwartz%E2%80%93Zippel_lemma" target="_blank" rel="noopener noreferrer" className="underline hover:text-sienna">Schwartz–Zippel lemma</a>).
         </li>
         <li>
           <strong>Shift queries</strong>: the verifier spot-checks a few
@@ -94,7 +96,7 @@ export function S6_WhirProtocol() {
       </p>
       <ol className="list-decimal ml-6 my-4 space-y-2">
         <li>
-          <strong>Sumcheck rounds</strong> — the prover runs <InlineMath tex="k" /> rounds of sumcheck, collapsing the algebraic constraint one variable at a time.
+          <strong>Sumcheck rounds</strong> — WHIR runs <InlineMath tex="k" /> internal rounds of sumcheck, reducing the proximity claim one variable at a time. (This is separate from the AIR constraint sumcheck that runs before WHIR opens.)
         </li>
         <li>
           <strong>Send folded function</strong> — using the sumcheck challenges as folding randomness, the prover shrinks the polynomial's domain and sends the new evaluations.
@@ -106,7 +108,7 @@ export function S6_WhirProtocol() {
           <strong>Shift queries</strong> — the verifier opens a few Merkle positions from the committed polynomial and checks the fold was computed correctly.
         </li>
         <li>
-          <strong>Rinse and repeat</strong> — the output becomes the input to the next iteration, now on a half-sized domain.
+          <strong>Rinse and repeat</strong> — the output becomes the input to the next iteration, now on a domain shrunk by <InlineMath tex="2^k" /> (e.g. <InlineMath tex="2^7 = 128\times" /> in leanMultisig's first round).
         </li>
       </ol>
       <p className="my-4">
@@ -292,6 +294,7 @@ export function S6_WhirProtocol() {
         just <InlineMath tex="2^3 = 8" /> evaluations in 4 iterations — producing a proof that
         the verifier can check in under a millisecond.
       </p>
+
     </Section>
   );
 }

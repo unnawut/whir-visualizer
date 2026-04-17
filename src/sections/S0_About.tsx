@@ -122,7 +122,7 @@ export function S0_About() {
           prime <InlineMath tex="p = 17" />) for readability. In leanMultisig, the field
           is the <strong>KoalaBear prime</strong>{' '}
           <InlineMath tex="p = 2^{31} - 2^{24} + 1" />, which fits in a single{' '}
-          <code>u32</code> and enables an efficient Poseidon2 S-box via the cubing
+          <code>u32</code> and enables an efficient Poseidon1 S-box via the cubing
           map <InlineMath tex="x \mapsto x^3" />. For 128-bit security in WHIR, leanMultisig works
           over the degree-5 extension field <InlineMath tex="\mathbb{F}_{p^5}" />.
         </li>

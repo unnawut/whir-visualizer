@@ -9,14 +9,14 @@ const stages = [
     label: 'Execution',
     color: '#1a365d',
     description:
-      'LeanMultisig executes a program that verifies leanSig signatures. The execution trace records every step: ADD, MUL, DEREF, JUMP instructions plus Poseidon2 hashes. A batch of 2,500 signatures produces millions of rows — but the prover wants to convince everyone the result is correct without verifying millions of rows each time.',
+      'LeanMultisig executes a program that verifies leanSig signatures. The execution trace records every step: ADD, MUL, DEREF, JUMP instructions plus Poseidon1 hashes. A batch of 2,500 signatures produces millions of rows — but the prover wants to convince everyone the result is correct without verifying millions of rows each time.',
   },
   {
     id: 'arithmetization',
     label: 'Arithmetization',
     color: '#1a365d',
     description:
-      'The execution trace is encoded as multilinear polynomials over the KoalaBear field. Using multilinear (rather than univariate) polynomials lets leanMultisig concatenate multiple table columns — execution, Poseidon2, extension ops — into a single polynomial by simply appending their evaluation tables. LeanMultisig\'s AIR constraints — degree-5 transition polynomials between consecutive rows — become polynomial equations. Instead of checking "did leanMultisig run this program correctly?", we now ask "do these polynomials satisfy certain relationships?"',
+      'The execution trace is encoded as multilinear polynomials over the KoalaBear field. Using multilinear (rather than univariate) polynomials lets leanMultisig concatenate multiple table columns — execution, Poseidon1, extension ops — into a single polynomial by simply appending their evaluation tables. LeanMultisig\'s AIR constraints — degree-5 transition polynomials between consecutive rows — become polynomial equations. Instead of checking "did leanMultisig run this program correctly?", we now ask "do these polynomials satisfy certain relationships?"',
   },
   {
     id: 'pcs',
@@ -129,7 +129,7 @@ export function S1_SnargsAndWhir() {
         </p>
         <p className="text-sm text-text-muted mt-3">
           <strong>LeanMultisig's proof system is a STARK:</strong> it uses hash-based commitments
-          (Poseidon2 + Merkle trees) with no pairing-based trusted setup, which is exactly
+          (Poseidon1 + Merkle trees) with no pairing-based trusted setup, which is exactly
           what you want when defending against quantum attackers.
         </p>
       </div>
@@ -160,6 +160,16 @@ export function S1_SnargsAndWhir() {
           proof in one shot
         </li>
       </ol>
+      <p>
+        A <strong>polynomial commitment scheme</strong> works in two phases:{' '}
+        <strong>commit</strong> — lock in a polynomial with a short,
+        tamper-proof digest (here, the root of a Merkle tree over its
+        evaluations) — and <strong>open</strong> — later reveal the
+        polynomial's value at a specific point, along with a proof that the
+        revealed value is consistent with the original commitment. WHIR is
+        leanMultisig's polynomial commitment scheme: it handles the commit and
+        every subsequent open.
+      </p>
       <p>
         WHIR's fast verification at step 3 is what makes <strong>recursive
         aggregation</strong> practical: leanMultisig can verify a WHIR proof{' '}
@@ -544,7 +554,7 @@ export function S1_SnargsAndWhir() {
               <p className="text-sm text-text-muted mb-2">
                 <strong>Why leanMultisig chose WHIR:</strong> WHIR functions as a multilinear polynomial
                 commitment scheme, which enables leanMultisig's "simple stacking" — multiple multilinear
-                polynomials (from the execution table, Poseidon2 table, and extension op table) are
+                polynomials (from the execution table, Poseidon1 table, and extension op table) are
                 concatenated into one and committed via a single WHIR instance. No need for
                 univariate FFT-based commitment like FRI or Plonky3. Being hash-based, it is
                 post-quantum secure and requires no trusted setup.

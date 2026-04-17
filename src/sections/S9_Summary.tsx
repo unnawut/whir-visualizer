@@ -19,11 +19,11 @@ const PROTOCOL_COLORS: Record<string, string> = {
   BaseFold: '#6b6375',
 };
 
-export function S8_Summary() {
+export function S9_Summary() {
   return (
     <Section
       id="why-fast"
-      number={8}
+      number={9}
       title="Summary"
       subtitle="What makes WHIR different, and where to go from here."
     >
@@ -64,6 +64,13 @@ export function S8_Summary() {
           parameter <InlineMath tex="k" />, code rate <InlineMath tex="\rho" />, and
           query count <InlineMath tex="t" /> jointly determine security, proof size,
           and performance.
+        </li>
+        <li>
+          <strong>WHIR in leanMultisig</strong> (Section 8) — WHIR is one piece of
+          a larger pipeline. A logup-GKR protocol handles memory consistency and an
+          AIR sumcheck handles the degree-5 execution constraints, both before
+          WHIR opens. The single-sumcheck batching and recursion-friendly
+          verification are what make the whole stack practical.
         </li>
       </ul>
 

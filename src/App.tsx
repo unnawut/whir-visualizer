@@ -9,7 +9,8 @@ import { S4_Sumcheck } from './sections/S4_Sumcheck'
 import { S5_Folding } from './sections/S5_Folding'
 import { S6_WhirProtocol } from './sections/S6_WhirProtocol'
 import { S7_TuningProtocol } from './sections/S7_TuningProtocol'
-import { S8_Summary } from './sections/S8_Summary'
+import { S8_WhirInLeanMultisig } from './sections/S8_WhirInLeanMultisig'
+import { S9_Summary } from './sections/S9_Summary'
 
 const SECTION_COMPONENTS = [
   S0_About,
@@ -20,7 +21,8 @@ const SECTION_COMPONENTS = [
   S5_Folding,
   S6_WhirProtocol,
   S7_TuningProtocol,
-  S8_Summary,
+  S8_WhirInLeanMultisig,
+  S9_Summary,
 ]
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') // e.g. "/whir-visualizer"

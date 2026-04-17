@@ -75,6 +75,15 @@ export const SECTIONS = [
     ],
   },
   {
+    id: 'whir-in-leanmultisig',
+    label: 'WHIR in leanMultisig',
+    subs: [
+      { label: 'What leanMultisig Needs to Prove', id: 'what-leanmultisig-needs' },
+      { label: 'The Full Pipeline', id: 'full-pipeline' },
+      { label: 'leanMultisig Parameters', id: 'leanmultisig-parameters' },
+    ],
+  },
+  {
     id: 'why-fast',
     label: 'Summary',
     subs: [
