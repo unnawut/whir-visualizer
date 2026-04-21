@@ -144,7 +144,20 @@ export function Layout({ activePage, onNavigate, children }: LayoutProps) {
       )}
 
       {/* Main content */}
-      <main className="md:ml-60 pt-14 md:pt-0 min-h-screen">{children}</main>
+      <main className="md:ml-60 pt-14 md:pt-0 min-h-screen">
+        {children}
+        <footer className="border-t border-border-light py-6 text-center text-xs text-text-muted">
+          Made with <span aria-label="love">❤️</span> by{' '}
+          <a
+            href="https://x.com/ReamLabs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-sienna"
+          >
+            ReamLabs
+          </a>
+        </footer>
+      </main>
     </div>
   );
 }
