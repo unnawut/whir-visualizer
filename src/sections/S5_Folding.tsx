@@ -28,6 +28,26 @@ const INITIAL_POLY: Poly = (() => {
 // Fixed folding challenge (in WHIR this would come from Fiat-Shamir / sumcheck).
 const ALPHA = 3;
 
+// Format a polynomial (coefficient array) as TeX. Trailing zeros are trimmed.
+function polyToTex(poly: Poly): string {
+  const trimmed = [...poly];
+  while (trimmed.length > 0 && trimmed[trimmed.length - 1] === 0) trimmed.pop();
+  if (trimmed.length === 0) return '0';
+  const terms: string[] = [];
+  for (let i = 0; i < trimmed.length; i++) {
+    const c = trimmed[i];
+    if (c === 0) continue;
+    if (i === 0) {
+      terms.push(`${c}`);
+    } else if (i === 1) {
+      terms.push(c === 1 ? 'x' : `${c}x`);
+    } else {
+      terms.push(c === 1 ? `x^{${i}}` : `${c}x^{${i}}`);
+    }
+  }
+  return terms.join(' + ');
+}
+
 export function S5_Folding() {
   const [tamperIdx, setTamperIdx] = useState<number | null>(null);
   const [foldCount, setFoldCount] = useState(0);
@@ -58,6 +78,7 @@ export function S5_Folding() {
       honestEvals: number[];
       expectedDeg: number;
       actualDeg: number;
+      poly: Poly;
     }[] = [];
     let d = domain8;
     let e = initialEvals;
@@ -67,7 +88,7 @@ export function S5_Folding() {
       const points: [number, number][] = d.map((x, idx) => [x, e[idx]]);
       const poly = interpolate(points);
       const actualDeg = Math.max(0, degree(poly));
-      all.push({ domain: d, evals: e, honestEvals: h, expectedDeg, actualDeg });
+      all.push({ domain: d, evals: e, honestEvals: h, expectedDeg, actualDeg, poly });
       if (d.length <= 1) break;
       const next = fold(e, d, ALPHA);
       const nextHonest = fold(h, d, ALPHA);
@@ -279,6 +300,9 @@ export function S5_Folding() {
                     </span>{' '}
                     {degOk ? '✓' : '✗'}
                   </span>
+                </div>
+                <div className="mb-2 text-[11px] text-text-muted">
+                  <InlineMath tex={`f_{${layerIdx}}(x) = ${polyToTex(layer.poly)}`} />
                 </div>
                 {(() => {
                   const svgW = 560;
