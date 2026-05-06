@@ -39,7 +39,17 @@ export function S0_About() {
           . If you spot something wrong, please open an issue on the study
           group repo. If
           you'd like to follow along with future sessions or dig deeper into
-          the Lean Ethereum ecosystem, check out the study group there.
+          the Lean Ethereum ecosystem, check out the study group there. The
+          session recording is on{' '}
+          <a
+            href="https://www.youtube.com/watch?v=tqs5xCQdVxk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-sienna"
+          >
+            YouTube
+          </a>
+          .
         </p>
       </div>
 
