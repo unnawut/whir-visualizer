@@ -147,7 +147,7 @@ export function Layout({ activePage, onNavigate, children }: LayoutProps) {
       <main className="md:ml-60 pt-14 md:pt-0 min-h-screen">
         {children}
         <footer className="border-t border-border-light py-6 text-center text-xs text-text-muted">
-          Made with <span aria-label="love">❤️</span> by{' '}
+          Made with <span aria-label="love">❤️</span> for{' '}
           <a
             href="https://x.com/ReamLabs"
             target="_blank"
@@ -155,6 +155,14 @@ export function Layout({ activePage, onNavigate, children }: LayoutProps) {
             className="underline hover:text-sienna"
           >
             ReamLabs
+          </a>{' '}
+          <a
+            href="https://www.youtube.com/watch?v=tqs5xCQdVxk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-sienna"
+          >
+            study group session on WHIR
           </a>
         </footer>
       </main>
