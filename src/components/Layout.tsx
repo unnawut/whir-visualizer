@@ -156,6 +156,15 @@ export function Layout({ activePage, onNavigate, children }: LayoutProps) {
           >
             ReamLabs' study group session on WHIR
           </a>
+          {' · '}
+          <a
+            href="https://github.com/ReamLabs/whir-intro"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-sienna"
+          >
+            Source
+          </a>
         </footer>
       </main>
     </div>
