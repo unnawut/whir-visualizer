@@ -25,7 +25,7 @@ const SECTION_COMPONENTS = [
   S9_Summary,
 ]
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') // e.g. "/whir-visualizer"
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') // e.g. "/whir-intro"
 
 function getPageFromPath(): number {
   const path = window.location.pathname.replace(BASE, '').replace(/^\//, '').replace(/\/$/, '')

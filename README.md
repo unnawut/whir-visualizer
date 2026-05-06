@@ -1,8 +1,8 @@
-# WHIR Visualizer
+# WHIR Intro
 
 An interactive, educational guide to the [WHIR protocol](https://eprint.iacr.org/2024/1586) — the polynomial commitment scheme used inside [leanMultisig](https://github.com/leanEthereum/leanMultisig) for post-quantum signature aggregation on Ethereum.
 
-**[Live site](https://leanethereum.github.io/whir-visualizer/)** (if deployed)
+> **A note on origin.** This was made for [Ream's study group](https://github.com/ReamLabs/ream-study-group) session on WHIR. It is **not an authoritative resource**, has not been reviewed by the WHIR researchers, and may contain inaccuracies — for the precise protocol, refer to the WHIR paper and the leanMultisig source code. If you spot something wrong, please open an issue.
 
 ## What is this?
 
@@ -32,7 +32,7 @@ The dev server runs at `http://localhost:5173/`.
 npm run build
 ```
 
-Output goes to `dist/`. The production build uses `base: '/whir-visualizer/'` for GitHub Pages deployment.
+Output goes to `dist/`. The production build uses `base: '/whir-intro/'` for GitHub Pages deployment.
 
 ### Type check
 

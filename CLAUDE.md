@@ -1,4 +1,4 @@
-# CLAUDE.md — WHIR Visualizer
+# CLAUDE.md — WHIR Intro
 
 Instructions and context for Claude Code sessions working on this project.
 
@@ -114,4 +114,4 @@ The parameter explorer uses approximate formulas:
 
 ## Deployment
 
-GitHub Pages via `npm run build`. The `base` path `/whir-visualizer/` is applied only in production builds.
+GitHub Pages via `npm run build`. The `base` path `/whir-intro/` is applied only in production builds.
